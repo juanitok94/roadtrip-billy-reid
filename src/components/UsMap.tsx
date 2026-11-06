@@ -167,10 +167,7 @@ export default function UsMap({
           <svg x="0" y="0" width={pxW} height={pxH} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}>
             <path
               d={layout.path}
-              fill="var(--surface)"
-              stroke="var(--ink-soft)"
-              strokeWidth="0.75"
-              strokeLinejoin="round"
+              className="rt-land"
               vectorEffect="non-scaling-stroke"
             />
             {!active &&
@@ -218,7 +215,7 @@ export default function UsMap({
                     y={y}
                     textAnchor="middle"
                     fontSize={LABEL_PX}
-                    fill="var(--ink)"
+                    fill="var(--ink-soft)"
                     stroke="var(--page)"
                     strokeWidth="3"
                     paintOrder="stroke"
@@ -287,7 +284,7 @@ export default function UsMap({
                 ref={wholeRef}
                 type="button"
                 onClick={zoomOut}
-                className="min-h-11 border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-on-dark"
+                className="min-h-11 border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page"
               >
                 Whole map
               </button>

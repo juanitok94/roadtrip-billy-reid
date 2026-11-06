@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
-/* Look: a printed ledger: square corners, 1px rules, dotted leaders, no shadows or gradients.
+/* Look: a printed ledger on dark navy: square corners, 1px rules, dotted leaders, no shadows or gradients.
    Tokens are defined once, here. npm run check:contrast prints every pair; check:data fails if one drops below AA.
-   Navy palette. --accent is for fills, rules and large text only; --accent-text wherever the colour has to be read
-   (links, small text, pins). --hairline is far below 3:1, so it never bounds a control. */
+   Dark only, no toggle. --accent is for fills, rules and large text only; --accent-text wherever the colour has to be
+   read (links, small text, pins). --line draws map state outlines and control borders. --hairline is far below 3:1,
+   so it never bounds a control. */
 :root {
-  --page: #F5F7FA;
-  --surface: #E2E8F0;
-  --ink: #0F1B2D;
-  --ink-hover: #1E2D45;
-  --ink-soft: #4A5568;
-  --accent: #2F5D9B;
-  --accent-text: #1F3A5F;
-  --on-dark: #FFFFFF;
-  --hairline: rgba(15, 27, 45, 0.1);
-  color-scheme: light;
+  --page: #0B1626;
+  --surface: #14253D;
+  --ink: #E8EEF7;
+  --ink-hover: #FFFFFF;
+  --ink-soft: #A9B6C8;
+  --accent: #5B8FD6;
+  --accent-text: #8DB4EC;
+  --line: #6F86A6;
+  --hairline: rgba(232, 238, 247, 0.14);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -25,7 +26,7 @@
   --color-ink-soft: var(--ink-soft);
   --color-accent: var(--accent);
   --color-accent-text: var(--accent-text);
-  --color-on-dark: var(--on-dark);
+  --color-line: var(--line);
   --color-hairline: var(--hairline);
 }
 
@@ -64,7 +65,7 @@ body {
 }
 
 option {
-  background: var(--page);
+  background: var(--surface);
   color: var(--ink);
 }
 
@@ -123,6 +124,14 @@ option {
   stroke-dasharray: none;
 }
 
+/* The land: --surface with --line state outlines. */
+.rt-land {
+  fill: var(--surface);
+  stroke: var(--line);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+}
+
 /* Map pins: the ring repeats the pin's own shape, so selecting one never hides what kind of store it is. */
 .rt-pin {
   cursor: pointer;
@@ -137,4 +146,23 @@ option {
 .rt-pin:hover .rt-ring,
 .rt-pin:focus-visible .rt-ring {
   opacity: 1;
+}
+
+/* Print stays light: white paper, black text, no map backgrounds. */
+@media print {
+  :root {
+    --page: #FFFFFF;
+    --surface: #FFFFFF;
+    --ink: #000000;
+    --ink-hover: #000000;
+    --ink-soft: #333333;
+    --accent: #1F3A5F;
+    --accent-text: #1F3A5F;
+    --line: #666666;
+    --hairline: rgba(0, 0, 0, 0.2);
+    color-scheme: light;
+  }
+  .rt-land {
+    fill: none;
+  }
 }

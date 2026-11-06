@@ -23,7 +23,7 @@ export default function ErrorScreen({
   )
 }
 
-export const PRIMARY = 'flex min-h-11 w-full items-center justify-center bg-ink px-4 text-sm text-on-dark transition-colors hover:bg-ink-hover'
+export const PRIMARY = 'flex min-h-11 w-full items-center justify-center bg-ink px-4 text-sm text-page transition-colors hover:bg-ink-hover'
 
 export const SECONDARY =
-  'flex min-h-11 w-full items-center justify-center border border-ink px-4 text-sm transition-colors hover:bg-ink hover:text-on-dark'
+  'flex min-h-11 w-full items-center justify-center border border-ink px-4 text-sm transition-colors hover:bg-ink hover:text-page'

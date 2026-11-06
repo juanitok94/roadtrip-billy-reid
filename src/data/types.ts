@@ -28,6 +28,7 @@ export type MapConfig = {
   fips: string | null // null: this map draws every state rather than one
   regions: RegionDef[]
   accent: string // hex; must equal --accent-text in globals.css (check:data enforces it)
+  themeColor: string // hex; must equal --page in globals.css (check:data enforces it)
   credits: string[]
   virtualStore?: VirtualStore
 }

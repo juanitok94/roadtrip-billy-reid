@@ -32,24 +32,28 @@ const pairOf = (t: Tokens, fg: string, bg: string, why: string): Pair => ({ name
 // Text and the background it actually sits on. Needs 4.5:1.
 export function textPairs(t: Tokens): Pair[] {
   return [
-    pairOf(t, '--ink', '--page', 'body, headline, row names, controls'),
-    pairOf(t, '--ink', '--surface', 'map labels over the land'),
-    pairOf(t, '--ink-soft', '--page', 'hours, service labels, footer, hints, placeholder'),
-    pairOf(t, '--accent-text', '--page', 'kicker, section label, selected pin number on its --page fill'),
-    pairOf(t, '--on-dark', '--ink', 'primary buttons'),
-    pairOf(t, '--on-dark', '--ink-hover', 'hovered primary button'),
-    pairOf(t, '--on-dark', '--accent-text', 'pin numbers'),
+    pairOf(t, '--ink', '--page', 'body, headline, row names'),
+    pairOf(t, '--ink', '--surface', 'input and select text'),
+    pairOf(t, '--ink-soft', '--page', 'hours, service labels, footer, hints'),
+    pairOf(t, '--ink-soft', '--surface', 'region labels over the land, placeholder text'),
+    pairOf(t, '--accent-text', '--page', 'kicker, section label, chevrons'),
+    pairOf(t, '--accent-text', '--surface', 'chevrons in inputs'),
+    pairOf(t, '--page', '--ink', 'primary buttons, selected pin number'),
+    pairOf(t, '--page', '--ink-hover', 'hovered primary button'),
+    pairOf(t, '--page', '--accent-text', 'pin numbers'),
   ]
 }
 
 // Graphics that must stand out from what is next to them. Needs 3:1.
 export function graphicPairs(t: Tokens): Pair[] {
   return [
-    pairOf(t, '--ink', '--page', 'control borders'),
-    pairOf(t, '--ink', '--surface', 'leaders'),
-    pairOf(t, '--ink-soft', '--page', 'state lines at the coast, row hover bar'),
-    pairOf(t, '--ink-soft', '--surface', 'state lines, region boxes'),
-    pairOf(t, '--accent-text', '--page', 'focus ring, chevrons, selected row bar'),
+    pairOf(t, '--line', '--surface', 'state outlines against the land; input borders'),
+    pairOf(t, '--line', '--page', 'state outlines at the coast; input borders on the page'),
+    pairOf(t, '--ink', '--page', 'secondary button borders'),
+    pairOf(t, '--ink', '--surface', 'leaders, selected pin fill on the land'),
+    pairOf(t, '--ink-soft', '--page', 'region boxes at the coast, row hover bar'),
+    pairOf(t, '--ink-soft', '--surface', 'region boxes over the land'),
+    pairOf(t, '--accent-text', '--page', 'focus ring, selected row bar'),
     pairOf(t, '--accent-text', '--surface', 'pins, selected pin ring, focus ring on a region'),
   ]
 }
@@ -59,10 +63,7 @@ export function unusedPairs(t: Tokens): Pair[] {
   return [
     pairOf(t, '--accent', '--page', 'decorative ledger and footer rules only; large text would need 3:1'),
     pairOf(t, '--accent', '--surface', 'not used'),
-    pairOf(t, '--on-dark', '--accent', 'not used; large text only if ever used'),
-    pairOf(t, '--ink', '--accent', 'not used; fails 4.5:1, so any text on an accent fill must be --on-dark'),
-    pairOf(t, '--ink-soft', '--surface', 'text not used; passes if it ever is'),
-    pairOf(t, '--accent-text', '--surface', 'text not used; passes if it ever is'),
+    pairOf(t, '--page', '--accent', 'not used; any text on an accent fill must be --page'),
     pairOf(t, '--surface', '--page', 'land against the page; the state lines carry the edge'),
   ]
 }
@@ -87,7 +88,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   graphicPairs(t).forEach((p) => line(p, 3))
   console.log('Not used')
   unusedPairs(t).forEach((p) => console.log(`${contrast(p.fg, p.bg).toFixed(2).padStart(6)}:1  ${p.name}  ${p.fg} / ${p.bg}`))
-  const hairline = overInk(t['--page'], t['--ink'], 0.1)
+  const hairline = overInk(t['--page'], t['--ink'], 0.14)
   console.log(`${contrast(hairline, t['--page']).toFixed(2).padStart(6)}:1  --hairline on --page (decorative separators only)  ${hairline} / ${t['--page']}`)
   if (failed) process.exit(1)
 }

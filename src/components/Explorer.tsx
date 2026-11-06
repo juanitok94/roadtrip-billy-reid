@@ -10,11 +10,11 @@ import { padNumber, type ListedStop } from '@/lib/stops'
 import { ALL, notifyUrl, parseChoice, readParam, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
 
 // Every control in the filter bar shares this: at least 44px tall (a wrapped phone label can grow) and one border.
-const CONTROL = 'block min-h-11 w-full border border-ink bg-transparent px-3 text-ink'
+const CONTROL = 'block min-h-11 w-full border border-line bg-surface px-3 text-ink'
 // Inputs and selects stay at 16px on phones, or iOS zooms the page when they take focus.
 const FIELD_TEXT = 'text-base md:text-sm'
 const OUTLINE_BUTTON =
-  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-on-dark'
+  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page'
 const LABEL = 'inline-block border border-hairline px-1.5 py-0.5 text-[11px] leading-tight text-ink-soft'
 const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>
 const HOURS_DISCLAIMER = "Hours change; check the store's page before you go."
@@ -282,19 +282,24 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
 
   return (
     <div>
-      <div ref={mapRef} className="scroll-mt-4">
-        <UsMap
-          layout={layout}
-          entries={mapped}
-          selectedId={selected?.id ?? null}
-          onSelect={selectPin}
-          regionId={region}
-          regionCounts={regionCounts}
-          onRegion={setRegion}
-          animate={regionTouched}
-        />
+      {/* From 768px the whole-country map is capped at 65% of the column and centred (about 35% smaller); zoomed into a
+          region it takes the full column. Phones always get the full width. The map is drawn in screen pixels, so pins
+          and labels keep their on-screen size at any width. */}
+      <div className={`mx-auto ${region === ALL ? 'md:max-w-[65%]' : ''}`}>
+        <div ref={mapRef} className="scroll-mt-4">
+          <UsMap
+            layout={layout}
+            entries={mapped}
+            selectedId={selected?.id ?? null}
+            onSelect={selectPin}
+            regionId={region}
+            regionCounts={regionCounts}
+            onRegion={setRegion}
+            animate={regionTouched}
+          />
+        </div>
+        <MapKey stops={mapped} />
       </div>
-      <MapKey stops={mapped} />
       {entries.length > 0 && mapped.length === 0 && (
         <p className="mt-2 text-center text-xs text-ink-soft">
           {layout.pins.length === 0 ? 'No stores are on the map yet. Every store is in the list below.' : 'Nothing to show on the map for these filters.'}

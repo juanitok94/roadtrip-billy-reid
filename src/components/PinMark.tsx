@@ -24,13 +24,13 @@ export function PinMark({ type, number, active }: { type: StoreType; number: num
   return (
     <>
       {active
-        ? pinShape(type, SIZE * SELECTED_SCALE, { fill: 'var(--page)', stroke: 'var(--accent-text)', strokeWidth: 3 })
+        ? pinShape(type, SIZE * SELECTED_SCALE, { fill: 'var(--ink)', stroke: 'var(--accent-text)', strokeWidth: 3 })
         : pinShape(type, SIZE, { fill: 'var(--accent-text)', stroke: 'var(--page)', strokeWidth: 1.5 })}
       <text
         textAnchor="middle"
         dominantBaseline="central"
         fontSize="11"
-        fill={active ? 'var(--accent-text)' : 'var(--on-dark)'}
+        fill="var(--page)"
         style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
       >
         {padNumber(number)}
