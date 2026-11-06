@@ -1,8 +1,8 @@
-// The filters live in the URL (?region=&experience=&type=&q=), so a filtered view can be shared. Pure helpers, plus
+// The filters live in the URL (?state=&region=&experience=&type=), so a filtered view can be shared. Pure helpers, plus
 // the URL as an external store for useSyncExternalStore. Unknown values fall back to "all" where they are used.
 export const ALL = 'all'
 
-export type FilterParam = 'region' | 'experience' | 'type' | 'q'
+export type FilterParam = 'state' | 'region' | 'experience' | 'type'
 
 export function readParam(search: string, name: FilterParam): string | null {
   try {

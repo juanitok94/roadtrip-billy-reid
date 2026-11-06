@@ -10,7 +10,7 @@
 Help someone plan a drive that hits several Billy Reid stores: see them on a U.S. map, filter by region and experience, pick stops, get an ordered route with approximate distance, and open real directions in their own maps app. Reference-only; no commerce.
 
 ## 2. What the source gives us (and doesn't)
-**Gives:** 16 physical locations in 13 states + DC, address, hours, and the experiences each offers (Pick Up, Curated Custom Experience, Complete Custom Experience, Complete Collection, Curated Collection), plus one Virtual store.
+**Gives:** 16 physical locations in 10 states + DC (count computed from stops.json), address, hours, and the experiences each offers (Pick Up, Curated Custom Experience, Complete Custom Experience, Complete Collection, Curated Collection), plus one Virtual store.
 **Types:** 13 regular retail, 1 custom showroom (Los Angeles, Beverly Hills address, limited ready-to-wear stock), 1 outlet (Elmont NY, no experiences listed), 1 virtual.
 **Doesn't give:** phone numbers, coordinates, store-specific URLs, open/closed beyond the hours line.
 **Quirks to handle:** the page lists Florence twice (once as "Your Closest Store", a personalization artifact; seeded once); "Los Angeles" is in Beverly Hills; the 5th Ave NYC and DC entries list "Curated Collection" rather than "Complete Collection"; the LA hours line carries an embedded note; hours are in mixed formats.
@@ -41,9 +41,9 @@ Every record: sourceUrl (https) + verifiedOn once checked. Virtual store lives i
 6. **Maintain:** re-verify monthly (retail hours change, holiday hours in Nov/Dec especially). Footer shows last verified date. Optional scheduled task to remind you on the 1st.
 
 ## 6. Page (v1)
-- Hero: kicker, headline, one-line description, stats ("16 stores in 13 states and DC").
+- Hero: kicker, headline, one-line description, stats, computed from stops.json: distinct states, DC counted separately ("16 stores in 10 states and DC").
 - U.S. map (state outlines from U.S. Census / us-atlas), pins for stops with lat/lng. Pin shape differs by storeType (round = retail, square = custom showroom, diamond = outlet); the shape plus a number is always visible, never color alone. Region zoom like Bourbon Guide.
-- Filter bar: search (city, state, address), Region, Experience (the services values), Store type.
+- Filter bar: dropdowns only, no text search: State (distinct states, DC included), Region, Experience (the services values), Store type. Each defaults to "All", has a visible label and a 44px native select. "Showing X of N", a Reset button when any filter is active, and URL state (?state=, ?region=, ?experience=, ?type=). Closed stops are never shown.
 - List as ledger rows (like Bourbon Guide): city/state, hours, services; expands for address, hours note, website, directions link.
 - Trip builder: "Add to trip" on each row and pin. The trip panel shows stops in a suggested order (nearest-neighbor from the stop you pick as start; drag or up/down buttons to reorder), leg distances and total, each labeled "approx. straight-line". "Get directions" links per leg to the visitor's maps app. Trip lives in the URL (?trip=id1,id2,id3) and has a print view.
 - Footer: trademark/unofficial line, hours disclaimer, last verified date, Virtual store mention, credits.

@@ -7,11 +7,11 @@ import { MAP, STORE_TYPES, storeTypeLabel } from '@/data/types'
 import type { MapLayout } from '@/lib/map-layout'
 import { STATE_NAMES } from '@/lib/states'
 import { padNumber, type ListedStop } from '@/lib/stops'
-import { ALL, notifyUrl, parseChoice, readParam, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
+import { ALL, notifyUrl, parseChoice, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
 
-// Every control in the filter bar shares this: at least 44px tall (a wrapped phone label can grow) and one border.
+// Every control in the filter bar shares this: at least 44px tall and one border.
 const CONTROL = 'block min-h-11 w-full border border-line bg-surface px-3 text-ink'
-// Inputs and selects stay at 16px on phones, or iOS zooms the page when they take focus.
+// Selects stay at 16px on phones, or iOS zooms the page when they take focus.
 const FIELD_TEXT = 'text-base md:text-sm'
 const OUTLINE_BUTTON =
   'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page'
@@ -22,7 +22,6 @@ const HOURS_DISCLAIMER = "Hours change; check the store's page before you go."
 const placeLabel = (d: ListedStop) => (d.city ? `${d.city}, ${d.state}` : 'Location not yet verified')
 const street = (d: ListedStop) => d.address?.split(',')[0] ?? null
 const directionsUrl = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
-const haystack = (d: ListedStop) => [d.city, d.state, STATE_NAMES[d.state], d.address].filter(Boolean).join(' ').toLowerCase()
 
 function Chevron({ className = '' }: { className?: string }) {
   return (
@@ -123,7 +122,7 @@ function Row({
   )
 }
 
-// A native select's text can't wrap, so the visible label is a span and the real select sits over it, invisible.
+// A native select with a visible label above it, 44px tall; the chevron is drawn over its right edge.
 function SelectControl({
   label,
   value,
@@ -138,26 +137,22 @@ function SelectControl({
   onChange: (id: string) => void
 }) {
   return (
-    <label className="relative block min-w-0">
-      <span className="sr-only">{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`peer absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0 ${FIELD_TEXT}`}
-      >
-        <option value={ALL}>{allOption}</option>
-        {options.map((o) => (
-          <option key={o.id} value={o.id}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-      <span
-        aria-hidden="true"
-        className={`${CONTROL} flex h-full items-center justify-between gap-1.5 py-2 text-sm leading-tight peer-hover:border-accent-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-text`}
-      >
-        <span className="min-w-0">{options.find((o) => o.id === value)?.label ?? allOption}</span>
-        <Chevron />
+    <label className="block min-w-0">
+      <span className="mb-1 block text-xs text-ink-soft">{label}</span>
+      <span className="relative block">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`${CONTROL} h-11 cursor-pointer appearance-none truncate pr-9 font-sans leading-tight hover:border-accent-text ${FIELD_TEXT}`}
+        >
+          <option value={ALL}>{allOption}</option>
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <Chevron className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2" />
       </span>
     </label>
   )
@@ -173,17 +168,23 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   const mapRef = useRef<HTMLDivElement>(null)
 
   const regionIds = useMemo(() => MAP.regions.map((r) => r.id), [])
+  const states = useMemo(
+    () =>
+      [...new Set(entries.map((d) => d.state))]
+        .map((id) => ({ id, label: STATE_NAMES[id] ?? id }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [entries],
+  )
   const experiences = useMemo(() => [...new Set(entries.flatMap((d) => d.services))].sort((a, b) => a.localeCompare(b)), [entries])
   const types = useMemo(() => STORE_TYPES.filter((t) => entries.some((d) => d.storeType === t.id)), [entries])
 
   // The filters live in the URL, so links are shareable. The static HTML renders the defaults (server snapshot); the
   // client then reads the real address bar.
   const search = useSyncExternalStore(subscribeToUrl, readSearch, () => '')
+  const state = parseChoice(search, 'state', states.map((x) => x.id))
   const region = parseChoice(search, 'region', regionIds)
   const experience = parseChoice(search, 'experience', experiences)
   const storeType = parseChoice(search, 'type', types.map((t) => t.id))
-  const rawQuery = readParam(search, 'q') ?? ''
-  const q = rawQuery.trim().toLowerCase()
 
   const setFilter = (name: FilterParam, value: string) => {
     writeParam(name, value)
@@ -198,11 +199,11 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   const inScope = useMemo(
     () =>
       entries.filter((d) => {
+        if (state !== ALL && d.state !== state) return false
         if (experience !== ALL && !d.services.includes(experience)) return false
-        if (storeType !== ALL && d.storeType !== storeType) return false
-        return !q || haystack(d).includes(q)
+        return storeType === ALL || d.storeType === storeType
       }),
-    [entries, experience, storeType, q],
+    [entries, state, experience, storeType],
   )
   const regionCounts = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -222,11 +223,11 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   // A selection or an open row only counts while its entry is still shown.
   const selected = visible.find((d) => d.id === selectedId && pinIds.has(d.id)) ?? null
   const expanded = visible.find((d) => d.id === expandedId)?.id ?? null
-  const filtersActive = q !== '' || region !== ALL || experience !== ALL || storeType !== ALL
+  const filtersActive = state !== ALL || region !== ALL || experience !== ALL || storeType !== ALL
 
   const reset = () => {
     setRegionTouched(true)
-    for (const name of ['region', 'experience', 'type', 'q'] as const) writeParam(name, '')
+    for (const name of ['state', 'region', 'experience', 'type'] as const) writeParam(name, '')
     notifyUrl()
   }
 
@@ -311,17 +312,8 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
           Find a store
         </h2>
         <div className="space-y-2">
-          <label className="block">
-            <span className="sr-only">Search by city, state or address</span>
-            <input
-              type="search"
-              placeholder="City, state or address"
-              value={rawQuery}
-              onChange={(e) => setFilter('q', e.target.value)}
-              className={`${CONTROL} ${FIELD_TEXT}`}
-            />
-          </label>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-4">
+            <SelectControl label="State" value={state} allOption="All states" options={states} onChange={(id) => setFilter('state', id)} />
             <SelectControl label="Region" value={region} allOption="All regions" options={MAP.regions} onChange={setRegion} />
             <SelectControl
               label="Experience"
