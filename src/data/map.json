@@ -13,7 +13,7 @@
     {"id": "northeast", "label": "Northeast & DC"},
     {"id": "west", "label": "West Coast"}
   ],
-  "accent": "#7F5E3C",
+  "accent": "#1F3A5F",
   "credits": ["Map outline: U.S. Census Bureau", "Locations: © OpenStreetMap contributors"],
   "virtualStore": {
     "name": "Virtual",

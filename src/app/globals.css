@@ -2,18 +2,18 @@
 
 /* Look: a printed ledger: square corners, 1px rules, dotted leaders, no shadows or gradients.
    Tokens are defined once, here. npm run check:contrast prints every pair; check:data fails if one drops below AA.
-   --accent is 2.98:1 on --page, under even the 3:1 for large text: use it for decorative rules and fills only, and
-   --accent-text wherever the colour has to be read. --hairline is far below 3:1, so it never bounds a control. */
+   Navy palette. --accent is for fills, rules and large text only; --accent-text wherever the colour has to be read
+   (links, small text, pins). --hairline is far below 3:1, so it never bounds a control. */
 :root {
-  --page: #F7F5F0;
-  --surface: #E8E2D5;
-  --ink: #231F20;
-  --ink-hover: #333333;
-  --ink-soft: #5f5a55;
-  --accent: #B0875F;
-  --accent-text: #7F5E3C;
+  --page: #F5F7FA;
+  --surface: #E2E8F0;
+  --ink: #0F1B2D;
+  --ink-hover: #1E2D45;
+  --ink-soft: #4A5568;
+  --accent: #2F5D9B;
+  --accent-text: #1F3A5F;
   --on-dark: #FFFFFF;
-  --hairline: rgba(0, 0, 0, 0.1);
+  --hairline: rgba(15, 27, 45, 0.1);
   color-scheme: light;
 }
 
@@ -135,7 +135,6 @@ option {
   stroke-width: 2px;
 }
 .rt-pin:hover .rt-ring,
-.rt-pin:focus-visible .rt-ring,
-.rt-pin[aria-expanded="true"] .rt-ring {
+.rt-pin:focus-visible .rt-ring {
   opacity: 1;
 }

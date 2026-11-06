@@ -4,6 +4,7 @@ import type { SVGProps } from 'react'
 import { padNumber } from '@/lib/stops'
 import type { StoreType } from '@/data/types'
 
+const SELECTED_SCALE = 1.2 // the selected pin is larger, so size is a cue as well as colour
 const SIZE = 13 // half the circle's width; the other shapes are sized to look the same weight and hold two digits
 
 export function pinShape(type: StoreType, half: number, props: SVGProps<SVGElement>) {
@@ -22,12 +23,14 @@ export function pinShape(type: StoreType, half: number, props: SVGProps<SVGEleme
 export function PinMark({ type, number, active }: { type: StoreType; number: number; active: boolean }) {
   return (
     <>
-      {pinShape(type, SIZE, { fill: active ? 'var(--ink)' : 'var(--accent-text)', stroke: 'var(--page)', strokeWidth: 1.5 })}
+      {active
+        ? pinShape(type, SIZE * SELECTED_SCALE, { fill: 'var(--page)', stroke: 'var(--accent-text)', strokeWidth: 3 })
+        : pinShape(type, SIZE, { fill: 'var(--accent-text)', stroke: 'var(--page)', strokeWidth: 1.5 })}
       <text
         textAnchor="middle"
         dominantBaseline="central"
         fontSize="11"
-        fill="var(--on-dark)"
+        fill={active ? 'var(--accent-text)' : 'var(--on-dark)'}
         style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
       >
         {padNumber(number)}
@@ -37,11 +40,12 @@ export function PinMark({ type, number, active }: { type: StoreType; number: num
 }
 
 export const PIN_RING = SIZE + 5
+export const PIN_RING_SELECTED = SIZE * SELECTED_SCALE + 5 // clear of the selected pin's 3px edge
 
 // The mark on its own, for a ledger row. Decorative there: the row says the number and the store type in text.
 export function RowMark({ type, number, active }: { type: StoreType; number: number; active: boolean }) {
   return (
-    <svg viewBox="-18 -18 36 36" width="36" height="36" aria-hidden="true" className="block shrink-0">
+    <svg viewBox="-18 -18 36 36" width="36" height="36" aria-hidden="true" className="block shrink-0 overflow-visible">
       <PinMark type={type} number={number} active={active} />
     </svg>
   )

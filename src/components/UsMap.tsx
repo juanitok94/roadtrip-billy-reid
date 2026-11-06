@@ -3,7 +3,7 @@
 // The U.S. map, drawn at build time from us-atlas (src/lib/map-layout.ts). No tiles, no map library. Zooming to a
 // region only changes the nested viewBox (instant under prefers-reduced-motion); pins keep their on-screen size.
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react'
-import { KeyMark, PIN_RING, PinMark, pinShape } from '@/components/PinMark'
+import { KeyMark, PIN_RING, PIN_RING_SELECTED, PinMark, pinShape } from '@/components/PinMark'
 import { MAP, STORE_TYPES, storeTypeLabel } from '@/data/types'
 import type { MapLayout, MapRegion } from '@/lib/map-layout'
 import { CHAR_W, LABEL_PX, PIN_PX, TARGET_PX, fitView, lerpView, placePins, toPx, type Rect } from '@/lib/map-view'
@@ -271,7 +271,7 @@ export default function UsMap({
                   : { 'aria-hidden': true })}
               >
                 <rect x={-TARGET_PX / 2} y={-TARGET_PX / 2} width={TARGET_PX} height={TARGET_PX} fill="transparent" />
-                {pinShape(d.storeType, PIN_RING, { className: 'rt-ring' })}
+                {pinShape(d.storeType, selected ? PIN_RING_SELECTED : PIN_RING, { className: 'rt-ring' })}
                 <PinMark type={d.storeType} number={d.number} active={selected} />
               </g>
             )

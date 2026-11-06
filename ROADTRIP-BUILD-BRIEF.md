@@ -49,7 +49,7 @@ Every record: sourceUrl (https) + verifiedOn once checked. Virtual store lives i
 - Footer: trademark/unofficial line, hours disclaimer, last verified date, Virtual store mention, credits.
 
 ## 7. Look
-Own look, not Wine & Gold. "Heritage Indigo": cream page (#f3ede1), indigo ink (#1f2a3a), rust accent (#a4472b), muted slate (#5b6573). Square corners, 1px rules, ledger-style list, dotted leaders. Fonts self-hosted: Fraunces 600 (headings, names), IBM Plex Mono 500 (labels). Verify WCAG AA for every text/background pair with a script and report ratios.
+Own look, not Wine & Gold. Navy palette: --page #F5F7FA, --surface #E2E8F0 (land), --ink #0F1B2D, --ink-soft #4A5568, --accent #2F5D9B (fills, rules and large text only), --accent-text #1F3A5F (links, small text, pins), --on-dark #FFFFFF, --ink-hover #1E2D45 (primary button hover). Hairlines are ink at 10% opacity. Primary buttons: --ink fill, white text. Pins: --accent-text with a white number; the selected pin is larger with a --page fill, a 3px --accent-text ring and the number in --accent-text (shape by store type is kept, so selection never relies on color). Square corners, 1px rules, ledger-style list, dotted leaders. Fonts self-hosted: Fraunces 600 (headings, names), IBM Plex Mono 500 (labels). No logo, brand fonts or images from billyreid.com. Verify WCAG AA for every text/background pair with `npm run check:contrast` and report ratios.
 
 ## 8. Out of scope for v1
 Accounts, ratings, reviews, product info, pricing, appointment booking, real driving routing (links out only), photos, logos.

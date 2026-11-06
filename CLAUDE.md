@@ -25,6 +25,9 @@ Next.js App Router, TypeScript, Tailwind, output "export". No API routes or serv
 ## Accessibility
 44px targets, visible focus rings, aria-pressed on toggles, aria-expanded on disclosures, prefers-reduced-motion, no color-only cues, list is the accessible alternative to the map, one h1, no horizontal scroll at 320px.
 
+## Look
+Navy palette, tokens defined once in src/app/globals.css: page #F5F7FA, surface #E2E8F0, ink #0F1B2D, ink-soft #4A5568, accent #2F5D9B (fills, rules, large text only), accent-text #1F3A5F (links, small text, pins), on-dark #FFFFFF, ink-hover #1E2D45. Hairlines are ink at 10%. Primary buttons ink fill, white text. Selected pin: larger, --page fill, 3px accent-text ring, number in accent-text; shape by store type is kept. Square corners, 1px rules, no shadows. No hard-coded colors outside globals.css and icon.svg. Run `npm run check:contrast` after any color change. No brand logo, fonts or images.
+
 ## Distances
 Straight-line (haversine) only, always labeled "approx. straight-line". Real driving directions open in the visitor's own maps app via a link built from the store address.
 
