@@ -16,8 +16,12 @@
   "accent": "#7F5E3C",
   "credits": ["Map outline: U.S. Census Bureau", "Locations: © OpenStreetMap contributors"],
   "virtualStore": {
-    "name": "Billy Reid Virtual Store",
+    "name": "Virtual",
     "note": "Online appointment, not a place to drive to. Listed in the footer, never on the map.",
-    "services": ["Complete Custom Experience"]
+    "services": ["Complete Custom Experience"],
+    "hoursNote": "Hours vary",
+    "website": "https://www.billyreid.com/pages/location/virtual-appointment",
+    "sourceUrl": "https://www.billyreid.com/pages/location/virtual-appointment",
+    "verifiedOn": "2026-11-06"
   }
 }

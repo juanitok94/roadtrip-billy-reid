@@ -7,7 +7,15 @@ export type StoreType = 'retail' | 'custom-showroom' | 'outlet'
 export type RegionDef = { id: string; label: string }
 
 // An online appointment, not a place to drive to: listed in the footer, never on the map or in stops.json.
-export type VirtualStore = { name: string; note: string; services: string[] }
+export type VirtualStore = {
+  name: string
+  note: string
+  services: string[]
+  hoursNote: string | null
+  website: string | null
+  sourceUrl: string | null // required (https) once verifiedOn is set
+  verifiedOn: string | null // YYYY-MM-DD
+}
 
 // Matches src/data/map.json.
 export type MapConfig = {

@@ -46,6 +46,10 @@ for (const r of MAP.regions) {
 }
 if (MAP.virtualStore && (blank(MAP.virtualStore.name) || !Array.isArray(MAP.virtualStore.services)))
   errors.push('map.json: virtualStore needs name and services')
+if (MAP.virtualStore?.verifiedOn) {
+  if (!DATE.test(MAP.virtualStore.verifiedOn)) errors.push('map.json: virtualStore verifiedOn must be YYYY-MM-DD')
+  if (!MAP.virtualStore.sourceUrl?.startsWith('https://')) errors.push('map.json: virtualStore verifiedOn is set but sourceUrl is missing or not https://')
+}
 
 // --- stops.json
 if (!Array.isArray(data)) errors.push('stops.json must be an array')
