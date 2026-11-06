@@ -95,7 +95,7 @@ async function main() {
     if (!s.address || !s.verifiedOn) continue
     const r = await geocode(s)
     if ('reason' in r) {
-      manual.push(`${s.id}: ${r.reason}`)
+      manual.push(`${s.id}: needs manual check. ${r.reason}`)
       continue
     }
     s.lat = r.lat
@@ -113,7 +113,8 @@ async function main() {
     console.log(dry ? 'dry run: stops.json not changed.' : 'nothing to write.')
     return
   }
-  writeFileSync(stopsPath, JSON.stringify(stops, null, 2) + '\n')
+  // Keep the file's one-record-per-line layout so the diff shows only the coordinates.
+  writeFileSync(stopsPath, '[\n' + stops.map((s) => '  ' + JSON.stringify(s)).join(',\n') + '\n]\n')
   console.log('wrote src/data/stops.json. Run npm run check:data and review the diff.')
 }
 
