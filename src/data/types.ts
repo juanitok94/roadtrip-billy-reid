@@ -19,7 +19,7 @@ export type MapConfig = {
   state: string // "US": this map covers the country, so each stop names its own state
   fips: string | null // null: this map draws every state rather than one
   regions: RegionDef[]
-  accent: string // hex; must equal --rust in globals.css (check:data enforces it)
+  accent: string // hex; must equal --accent-text in globals.css (check:data enforces it)
   credits: string[]
   virtualStore?: VirtualStore
 }

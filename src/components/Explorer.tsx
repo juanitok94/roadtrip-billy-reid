@@ -10,12 +10,12 @@ import { padNumber, type ListedStop } from '@/lib/stops'
 import { ALL, notifyUrl, parseChoice, readParam, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
 
 // Every control in the filter bar shares this: at least 44px tall (a wrapped phone label can grow) and one border.
-const CONTROL = 'block min-h-11 w-full border border-indigo bg-transparent px-3 text-indigo'
+const CONTROL = 'block min-h-11 w-full border border-ink bg-transparent px-3 text-ink'
 // Inputs and selects stay at 16px on phones, or iOS zooms the page when they take focus.
 const FIELD_TEXT = 'text-base md:text-sm'
 const OUTLINE_BUTTON =
-  'inline-flex min-h-11 items-center border border-indigo px-4 text-sm text-indigo transition-colors hover:bg-indigo hover:text-cream'
-const LABEL = 'inline-block border border-slate px-1.5 py-0.5 text-[11px] leading-tight text-slate'
+  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-on-dark'
+const LABEL = 'inline-block border border-hairline px-1.5 py-0.5 text-[11px] leading-tight text-ink-soft'
 const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>
 const HOURS_DISCLAIMER = "Hours change; check the store's page before you go."
 
@@ -26,7 +26,7 @@ const haystack = (d: ListedStop) => [d.city, d.state, STATE_NAMES[d.state], d.ad
 
 function Chevron({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 12 12" className={`h-3 w-3 shrink-0 text-rust ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 12 12" className={`h-3 w-3 shrink-0 text-accent-text ${className}`} aria-hidden="true">
       <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="square" />
     </svg>
   )
@@ -38,8 +38,8 @@ function RowDetails({ d, onMap, onShowOnMap }: { d: ListedStop; onMap: boolean; 
     <div id={`row-${d.id}-details`} className="space-y-3 pt-1 pb-4 pl-12 text-sm">
       <p className="font-serif text-base font-semibold">{d.name}</p>
       {d.address && <p>{d.address}</p>}
-      {d.hoursNote && <p className="text-slate">{d.hoursNote}</p>}
-      {d.note && <p className="text-slate">{d.note}</p>}
+      {d.hoursNote && <p className="text-ink-soft">{d.hoursNote}</p>}
+      {d.note && <p className="text-ink-soft">{d.note}</p>}
       <div className="flex flex-wrap items-center gap-2">
         {d.website && (
           <a href={d.website} target="_blank" rel="noopener" className={OUTLINE_BUTTON}>
@@ -61,10 +61,10 @@ function RowDetails({ d, onMap, onShowOnMap }: { d: ListedStop; onMap: boolean; 
             Show on map
           </button>
         ) : (
-          <p className="flex min-h-11 items-center text-xs text-slate">Not on the map yet</p>
+          <p className="flex min-h-11 items-center text-xs text-ink-soft">Not on the map yet</p>
         )}
       </div>
-      <p className="text-xs text-slate">{HOURS_DISCLAIMER}</p>
+      <p className="text-xs text-ink-soft">{HOURS_DISCLAIMER}</p>
     </div>
   )
 }
@@ -104,9 +104,9 @@ function Row({
               <span className="sr-only">{padNumber(d.number)}. </span>
               {placeLabel(d)}
             </span>
-            {showStreet && <span className="text-xs leading-snug text-slate">{street(d)}</span>}
+            {showStreet && <span className="text-xs leading-snug text-ink-soft">{street(d)}</span>}
             <span aria-hidden="true" className="rt-leader hidden md:block" />
-            {d.hoursNote && <span className="tabular mt-0.5 text-xs leading-snug text-slate md:mt-0">{d.hoursNote}</span>}
+            {d.hoursNote && <span className="tabular mt-0.5 text-xs leading-snug text-ink-soft md:mt-0">{d.hoursNote}</span>}
           </span>
           <span className="mt-2 flex flex-wrap gap-1">
             {labels.map((l) => (
@@ -154,7 +154,7 @@ function SelectControl({
       </select>
       <span
         aria-hidden="true"
-        className={`${CONTROL} flex h-full items-center justify-between gap-1.5 py-2 text-sm leading-tight peer-hover:border-rust peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-rust`}
+        className={`${CONTROL} flex h-full items-center justify-between gap-1.5 py-2 text-sm leading-tight peer-hover:border-accent-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-text`}
       >
         <span className="min-w-0">{options.find((o) => o.id === value)?.label ?? allOption}</span>
         <Chevron />
@@ -296,7 +296,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
       </div>
       <MapKey stops={mapped} />
       {entries.length > 0 && mapped.length === 0 && (
-        <p className="mt-2 text-center text-xs text-slate">
+        <p className="mt-2 text-center text-xs text-ink-soft">
           {layout.pins.length === 0 ? 'No stores are on the map yet. Every store is in the list below.' : 'Nothing to show on the map for these filters.'}
         </p>
       )}
@@ -328,7 +328,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
             <SelectControl label="Store type" value={storeType} allOption="All store types" options={types} onChange={(id) => setFilter('type', id)} />
           </div>
           <div className="flex min-h-11 flex-wrap items-center gap-4">
-            <p role="status" className="tabular text-xs text-slate">
+            <p role="status" className="tabular text-xs text-ink-soft">
               Showing {visible.length} of {entries.length}
             </p>
             {filtersActive && (
@@ -341,7 +341,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
       </section>
 
       <section aria-labelledby="stores-heading" className="mt-4">
-        <h2 id="stores-heading" className="text-xs tracking-[0.2em] text-rust uppercase">
+        <h2 id="stores-heading" className="text-xs tracking-[0.2em] text-accent-text uppercase">
           Stores
         </h2>
         {entries.length === 0 ? (

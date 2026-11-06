@@ -11,8 +11,8 @@ export default function SiteFooter() {
   const latest = latestVerified(VISITOR_STOPS)
   return (
     <footer className="mx-auto mt-12 max-w-5xl px-4 pb-8">
-      <div className="rt-ruled space-y-2 pt-5 text-xs leading-relaxed text-slate">
-        <p className="text-indigo">{UNOFFICIAL}</p>
+      <div className="rt-ruled space-y-2 pt-5 text-xs leading-relaxed text-ink-soft">
+        <p className="text-ink">{UNOFFICIAL}</p>
         <p className="tabular">{latest ? `Last verified: ${formatDate(latest)}` : 'Stores not yet verified'}</p>
         {MAP.virtualStore && <p>{VIRTUAL}</p>}
         {MAP.credits.map((c) => (

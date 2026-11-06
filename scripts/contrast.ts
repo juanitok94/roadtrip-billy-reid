@@ -1,4 +1,4 @@
-// WCAG contrast for the Heritage Indigo tokens, read from globals.css (the one place they are defined).
+// WCAG contrast for the colour tokens, read from globals.css (the one place they are defined).
 // Run: npm run check:contrast. check:data fails on the same pairs.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -32,26 +32,45 @@ const pairOf = (t: Tokens, fg: string, bg: string, why: string): Pair => ({ name
 // Text and the background it actually sits on. Needs 4.5:1.
 export function textPairs(t: Tokens): Pair[] {
   return [
-    pairOf(t, '--indigo', '--cream', 'body, headline, row names, controls, map labels'),
-    pairOf(t, '--slate', '--cream', 'hours, service labels, footer, hints, placeholder'),
-    pairOf(t, '--rust', '--cream', 'kicker, section label'),
-    pairOf(t, '--cream', '--indigo', 'pin numbers, hovered buttons'),
-    pairOf(t, '--cream', '--rust', 'selected pin number, hovered primary button'),
+    pairOf(t, '--ink', '--page', 'body, headline, row names, controls'),
+    pairOf(t, '--ink', '--surface', 'map labels over the land'),
+    pairOf(t, '--ink-soft', '--page', 'hours, service labels, footer, hints, placeholder'),
+    pairOf(t, '--accent-text', '--page', 'kicker, section label'),
+    pairOf(t, '--on-dark', '--ink', 'selected pin number, primary and hovered buttons'),
+    pairOf(t, '--on-dark', '--ink-hover', 'hovered primary button'),
+    pairOf(t, '--on-dark', '--accent-text', 'pin numbers'),
   ]
 }
 
 // Graphics that must stand out from what is next to them. Needs 3:1.
 export function graphicPairs(t: Tokens): Pair[] {
   return [
-    pairOf(t, '--indigo', '--cream', 'pins, control borders, map frame, ledger rule'),
-    pairOf(t, '--slate', '--cream', 'state lines, dotted rules, label borders'),
-    pairOf(t, '--rust', '--cream', 'focus ring, selected pin, chevrons'),
+    pairOf(t, '--ink', '--page', 'control borders'),
+    pairOf(t, '--ink', '--surface', 'selected pin, leaders'),
+    pairOf(t, '--ink-soft', '--page', 'state lines at the coast, row hover bar'),
+    pairOf(t, '--ink-soft', '--surface', 'state lines, region boxes'),
+    pairOf(t, '--accent-text', '--page', 'focus ring, chevrons, selected row bar'),
+    pairOf(t, '--accent-text', '--surface', 'pins, focus ring on a region'),
   ]
 }
 
-// Pairs that would fail, listed so nobody reaches for them. They appear nowhere on the page.
+// Pairs no text or meaningful graphic relies on, listed so nobody reaches for them. Reported, not enforced.
 export function unusedPairs(t: Tokens): Pair[] {
-  return [pairOf(t, '--rust', '--indigo', 'not used; hover and active states never put the two together')]
+  return [
+    pairOf(t, '--accent', '--page', 'decorative ledger and footer rules only; large text would need 3:1'),
+    pairOf(t, '--accent', '--surface', 'not used'),
+    pairOf(t, '--on-dark', '--accent', 'not used; large text only if ever used'),
+    pairOf(t, '--ink', '--accent', 'not used; the text colour for any future accent fill'),
+    pairOf(t, '--ink-soft', '--surface', 'text not used; passes if it ever is'),
+    pairOf(t, '--accent-text', '--surface', 'text not used; passes if it ever is'),
+    pairOf(t, '--surface', '--page', 'land against the page; the state lines carry the edge'),
+  ]
+}
+
+// A translucent black token composited over a background, as it renders. For reporting hairlines.
+function overBlack(bg: string, alpha: number): string {
+  const channel = (i: number) => Math.round(parseInt(bg.slice(i, i + 2), 16) * (1 - alpha))
+  return `#${[1, 3, 5].map((i) => channel(i).toString(16).padStart(2, '0')).join('')}`
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -68,5 +87,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   graphicPairs(t).forEach((p) => line(p, 3))
   console.log('Not used')
   unusedPairs(t).forEach((p) => console.log(`${contrast(p.fg, p.bg).toFixed(2).padStart(6)}:1  ${p.name}  ${p.fg} / ${p.bg}`))
+  const hairline = overBlack(t['--page'], 0.1)
+  console.log(`${contrast(hairline, t['--page']).toFixed(2).padStart(6)}:1  --hairline on --page (decorative separators only)  ${hairline} / ${t['--page']}`)
   if (failed) process.exit(1)
 }

@@ -1,21 +1,32 @@
 @import "tailwindcss";
 
-/* Look: "Heritage Indigo". A printed ledger: square corners, 1px rules, dotted leaders, no shadows or gradients.
+/* Look: a printed ledger: square corners, 1px rules, dotted leaders, no shadows or gradients.
    Tokens are defined once, here. npm run check:contrast prints every pair; check:data fails if one drops below AA.
-   --rust on --indigo is below AA, so the two never touch: hovers and active states use cream on indigo or on rust. */
+   --accent is 2.98:1 on --page, under even the 3:1 for large text: use it for decorative rules and fills only, and
+   --accent-text wherever the colour has to be read. --hairline is far below 3:1, so it never bounds a control. */
 :root {
-  --cream: #f3ede1;
-  --indigo: #1f2a3a;
-  --rust: #a4472b;
-  --slate: #5b6573;
+  --page: #F7F5F0;
+  --surface: #E8E2D5;
+  --ink: #231F20;
+  --ink-hover: #333333;
+  --ink-soft: #5f5a55;
+  --accent: #B0875F;
+  --accent-text: #7F5E3C;
+  --on-dark: #FFFFFF;
+  --hairline: rgba(0, 0, 0, 0.1);
   color-scheme: light;
 }
 
 @theme inline {
-  --color-cream: var(--cream);
-  --color-indigo: var(--indigo);
-  --color-rust: var(--rust);
-  --color-slate: var(--slate);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-hover: var(--ink-hover);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-on-dark: var(--on-dark);
+  --color-hairline: var(--hairline);
 }
 
 /* The one place to swap a typeface. Self-hosted from @fontsource (imported in layout.tsx). */
@@ -25,13 +36,13 @@
 }
 
 html {
-  background: var(--cream);
-  color: var(--indigo);
+  background: var(--page);
+  color: var(--ink);
 }
 
 body {
   min-height: 100vh;
-  background: var(--cream);
+  background: var(--page);
   font-family: var(--font-mono);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -43,18 +54,18 @@ body {
 
 /* Visible focus ring on every interactive element. */
 :focus-visible {
-  outline: 2px solid var(--rust);
+  outline: 2px solid var(--accent-text);
   outline-offset: 2px;
 }
 
 ::placeholder {
-  color: var(--slate);
+  color: var(--ink-soft);
   opacity: 1;
 }
 
 option {
-  background: var(--cream);
-  color: var(--indigo);
+  background: var(--page);
+  color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -70,23 +81,23 @@ option {
 
 /* Ledger: a heavy rule on top, dotted rules between rows, a dotted leader from the city to its hours. */
 .rt-ruled {
-  border-top: 1px solid var(--indigo);
+  border-top: 1px solid var(--accent);
 }
 .rt-row {
-  border-bottom: 1px dotted var(--slate);
+  border-bottom: 1px dotted var(--hairline);
 }
 .rt-row-button:hover {
-  box-shadow: inset 3px 0 0 var(--slate);
+  box-shadow: inset 3px 0 0 var(--ink-soft);
 }
 .rt-row[data-highlighted] {
-  box-shadow: inset 3px 0 0 var(--rust);
+  box-shadow: inset 3px 0 0 var(--accent-text);
 }
 .rt-leader {
   min-width: 1.5rem;
   flex: 1;
   align-self: flex-end;
   margin-bottom: 0.35rem;
-  border-bottom: 1px dotted var(--slate);
+  border-bottom: 1px dotted var(--hairline);
 }
 
 /* Map regions: quiet dotted boxes under the pins. SVG outlines are unreliable, so focus draws on the box itself. */
@@ -95,9 +106,9 @@ option {
   outline: none;
 }
 .rt-region-box {
-  fill: var(--indigo);
+  fill: var(--ink);
   fill-opacity: 0;
-  stroke: var(--slate);
+  stroke: var(--ink-soft);
   stroke-width: 1px;
   stroke-dasharray: 1 4;
   transition: fill-opacity 0.15s ease;
@@ -107,7 +118,7 @@ option {
 }
 .rt-region:focus-visible .rt-region-box {
   fill-opacity: 0.08;
-  stroke: var(--rust);
+  stroke: var(--accent-text);
   stroke-width: 3px;
   stroke-dasharray: none;
 }
@@ -120,7 +131,7 @@ option {
 .rt-ring {
   opacity: 0;
   fill: none;
-  stroke: var(--rust);
+  stroke: var(--accent-text);
   stroke-width: 2px;
 }
 .rt-pin:hover .rt-ring,

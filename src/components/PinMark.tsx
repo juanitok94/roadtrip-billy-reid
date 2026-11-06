@@ -22,12 +22,12 @@ export function pinShape(type: StoreType, half: number, props: SVGProps<SVGEleme
 export function PinMark({ type, number, active }: { type: StoreType; number: number; active: boolean }) {
   return (
     <>
-      {pinShape(type, SIZE, { fill: active ? 'var(--rust)' : 'var(--indigo)', stroke: 'var(--cream)', strokeWidth: 1.5 })}
+      {pinShape(type, SIZE, { fill: active ? 'var(--ink)' : 'var(--accent-text)', stroke: 'var(--page)', strokeWidth: 1.5 })}
       <text
         textAnchor="middle"
         dominantBaseline="central"
         fontSize="11"
-        fill="var(--cream)"
+        fill="var(--on-dark)"
         style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
       >
         {padNumber(number)}
@@ -51,7 +51,7 @@ export function RowMark({ type, number, active }: { type: StoreType; number: num
 export function KeyMark({ type }: { type: StoreType }) {
   return (
     <svg viewBox="-9 -9 18 18" width="18" height="18" aria-hidden="true" className="block shrink-0">
-      {pinShape(type, 6, { fill: 'var(--indigo)' })}
+      {pinShape(type, 6, { fill: 'var(--accent-text)' })}
     </svg>
   )
 }

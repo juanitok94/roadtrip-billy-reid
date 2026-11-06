@@ -35,7 +35,7 @@ export function MapKey({ stops }: { stops: ListedStop[] }) {
   const types = STORE_TYPES.filter((t) => stops.some((d) => d.storeType === t.id))
   if (types.length === 0) return null
   return (
-    <ul aria-label="Map key" className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate">
+    <ul aria-label="Map key" className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-ink-soft">
       {types.map((t) => (
         <li key={t.id} className="flex items-center gap-1.5">
           <KeyMark type={t.id} />
@@ -161,14 +161,14 @@ export default function UsMap({
       <section
         ref={wrapRef}
         aria-label={`Map of stores (${MAP.title}). The list below the map is the accessible alternative to this map.`}
-        className="border border-indigo"
+        className="border border-hairline"
       >
         <svg ref={svgRef} viewBox={`0 0 ${pxW} ${pxH}`} className="block h-auto w-full">
           <svg x="0" y="0" width={pxW} height={pxH} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}>
             <path
               d={layout.path}
-              fill="none"
-              stroke="var(--slate)"
+              fill="var(--surface)"
+              stroke="var(--ink-soft)"
               strokeWidth="0.75"
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
@@ -218,8 +218,8 @@ export default function UsMap({
                     y={y}
                     textAnchor="middle"
                     fontSize={LABEL_PX}
-                    fill="var(--indigo)"
-                    stroke="var(--cream)"
+                    fill="var(--ink)"
+                    stroke="var(--page)"
                     strokeWidth="3"
                     paintOrder="stroke"
                     style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
@@ -239,8 +239,8 @@ export default function UsMap({
                 if (!s || Math.hypot(s.x - s.x0, s.y - s.y0) < 2) return null
                 return (
                   <g key={d.id}>
-                    <line x1={s.x} y1={s.y} x2={s.x0} y2={s.y0} stroke="var(--indigo)" strokeWidth="1" />
-                    <circle cx={s.x0} cy={s.y0} r="2" fill="var(--indigo)" />
+                    <line x1={s.x} y1={s.y} x2={s.x0} y2={s.y0} stroke="var(--ink)" strokeWidth="1" />
+                    <circle cx={s.x0} cy={s.y0} r="2" fill="var(--ink)" />
                   </g>
                 )
               })}
@@ -280,14 +280,14 @@ export default function UsMap({
       </section>
 
       {regions.length > 0 && (
-        <div className="mt-2 flex min-h-6 flex-wrap items-center justify-center gap-x-3 text-xs text-slate">
+        <div className="mt-2 flex min-h-6 flex-wrap items-center justify-center gap-x-3 text-xs text-ink-soft">
           {active ? (
             <>
               <button
                 ref={wholeRef}
                 type="button"
                 onClick={zoomOut}
-                className="min-h-11 border border-indigo px-4 text-sm text-indigo transition-colors hover:bg-indigo hover:text-cream"
+                className="min-h-11 border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-on-dark"
               >
                 Whole map
               </button>
