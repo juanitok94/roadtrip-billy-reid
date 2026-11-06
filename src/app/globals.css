@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/* Look: "Heritage Indigo". A printed ledger: square corners, 1px rules, dotted leaders, no shadows or gradients.
+   Tokens are defined once, here. npm run check:contrast prints every pair; check:data fails if one drops below AA.
+   --rust on --indigo is below AA, so the two never touch: hovers and active states use cream on indigo or on rust. */
+:root {
+  --cream: #f3ede1;
+  --indigo: #1f2a3a;
+  --rust: #a4472b;
+  --slate: #5b6573;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-indigo: var(--indigo);
+  --color-rust: var(--rust);
+  --color-slate: var(--slate);
+}
+
+/* The one place to swap a typeface. Self-hosted from @fontsource (imported in layout.tsx). */
+@theme static {
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+html {
+  background: var(--cream);
+  color: var(--indigo);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--cream);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible focus ring on every interactive element. */
+:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 2px;
+}
+
+::placeholder {
+  color: var(--slate);
+  opacity: 1;
+}
+
+option {
+  background: var(--cream);
+  color: var(--indigo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ledger: a heavy rule on top, dotted rules between rows, a dotted leader from the city to its hours. */
+.rt-ruled {
+  border-top: 1px solid var(--indigo);
+}
+.rt-row {
+  border-bottom: 1px dotted var(--slate);
+}
+.rt-row-button:hover {
+  box-shadow: inset 3px 0 0 var(--slate);
+}
+.rt-row[data-highlighted] {
+  box-shadow: inset 3px 0 0 var(--rust);
+}
+.rt-leader {
+  min-width: 1.5rem;
+  flex: 1;
+  align-self: flex-end;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px dotted var(--slate);
+}
+
+/* Map regions: quiet dotted boxes under the pins. SVG outlines are unreliable, so focus draws on the box itself. */
+.rt-region {
+  cursor: pointer;
+  outline: none;
+}
+.rt-region-box {
+  fill: var(--indigo);
+  fill-opacity: 0;
+  stroke: var(--slate);
+  stroke-width: 1px;
+  stroke-dasharray: 1 4;
+  transition: fill-opacity 0.15s ease;
+}
+.rt-region:hover .rt-region-box {
+  fill-opacity: 0.08;
+}
+.rt-region:focus-visible .rt-region-box {
+  fill-opacity: 0.08;
+  stroke: var(--rust);
+  stroke-width: 3px;
+  stroke-dasharray: none;
+}
+
+/* Map pins: the ring repeats the pin's own shape, so selecting one never hides what kind of store it is. */
+.rt-pin {
+  cursor: pointer;
+  outline: none;
+}
+.rt-ring {
+  opacity: 0;
+  fill: none;
+  stroke: var(--rust);
+  stroke-width: 2px;
+}
+.rt-pin:hover .rt-ring,
+.rt-pin:focus-visible .rt-ring,
+.rt-pin[aria-expanded="true"] .rt-ring {
+  opacity: 1;
+}

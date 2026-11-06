@@ -1,0 +1,23 @@
+{
+  "id": "roadtrip-billy-reid",
+  "title": "Billy Reid Road Trip",
+  "kicker": "AN UNOFFICIAL GUIDE TO BILLY REID STORES",
+  "seoTitle": "Billy Reid Road Trip: Unofficial Store Guide",
+  "seoDescription": "An unofficial map and list of Billy Reid stores for planning a road trip, with addresses, hours notes and directions links.",
+  "state": "US",
+  "fips": null,
+  "regions": [
+    {"id": "southeast", "label": "Southeast"},
+    {"id": "gulf-texas", "label": "Gulf & Texas"},
+    {"id": "midwest", "label": "Midwest"},
+    {"id": "northeast", "label": "Northeast & DC"},
+    {"id": "west", "label": "West Coast"}
+  ],
+  "accent": "#a4472b",
+  "credits": ["Map outline: U.S. Census Bureau", "Locations: © OpenStreetMap contributors"],
+  "virtualStore": {
+    "name": "Billy Reid Virtual Store",
+    "note": "Online appointment, not a place to drive to. Listed in the footer, never on the map.",
+    "services": ["Complete Custom Experience"]
+  }
+}
