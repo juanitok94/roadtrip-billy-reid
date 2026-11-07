@@ -11,7 +11,7 @@ Help someone plan a drive that hits several Billy Reid stores: see them on a U.S
 
 ## 2. What the source gives us (and doesn't)
 **Gives:** 16 physical locations in 10 states + DC (count computed from stops.json), address, hours, and the experiences each offers (Pick Up, Curated Custom Experience, Complete Custom Experience, Complete Collection, Curated Collection), plus one Virtual store.
-**Types:** 13 regular retail, 1 custom showroom (Los Angeles, Beverly Hills address, limited ready-to-wear stock), 1 outlet (Elmont NY, no experiences listed), 1 virtual.
+**Types:** 14 retail (including New York 5th Ave and Washington DC, which the site lists under Custom but does not call showrooms), 1 custom showroom (Los Angeles, Beverly Hills address, limited ready-to-wear stock), 1 outlet (Elmont NY, no experiences listed), plus 1 virtual store (not in stops.json).
 **Doesn't give:** phone numbers, coordinates, store-specific URLs, open/closed beyond the hours line.
 **Quirks to handle:** the page lists Florence twice (once as "Your Closest Store", a personalization artifact; seeded once); "Los Angeles" is in Beverly Hills; the 5th Ave NYC and DC entries list "Curated Collection" rather than "Complete Collection"; the LA hours line carries an embedded note; hours are in mixed formats.
 
