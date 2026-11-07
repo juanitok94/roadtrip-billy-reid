@@ -1,6 +1,7 @@
 import Duotone from '@/components/Duotone'
 import Explorer from '@/components/Explorer'
 import HeroScroll from '@/components/HeroScroll'
+import { heroCssVars } from '@/components/heroConfig'
 import { MAP } from '@/data/types'
 import { computeLayout } from '@/lib/map-layout'
 import { homeJsonLd, SEO_DESCRIPTION, storeStats } from '@/lib/site'
@@ -34,11 +35,12 @@ export default function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: homeJsonLd(entries) }} />
       {/* The hero fills the first screen: centred text on navy above, the photo full-bleed below. See .rt-hero in
           globals.css for the scroll move (the halves part, the photo drifts) and the static version. */}
-      <header className="rt-no-print rt-hero">
+      <header className="rt-no-print rt-hero" style={heroCssVars}>
+        <div className="rt-hero-frame">
         <div className="rt-hero-text mx-auto w-full max-w-5xl px-4 text-center">
-          <p className="text-[11px] leading-snug tracking-[0.18em] text-accent-text">{MAP.kicker}</p>
+          <p className="rt-hero-kicker text-[11px] leading-snug tracking-[0.18em] text-accent-text">{MAP.kicker}</p>
           {/* The full title stays the accessible name; the two halves are decoration for the scroll effect. */}
-          <h1 aria-label={MAP.title} className="rt-hero-h1 mt-4 font-serif font-semibold">
+          <h1 aria-label={MAP.title} className="rt-hero-h1 font-serif font-semibold">
             <span aria-hidden="true" className="rt-hero-a">
               <Words text={titleTop} from={0} />
             </span>{' '}
@@ -47,7 +49,7 @@ export default function Home() {
             </span>
           </h1>
           <div className="rt-hero-copy">
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed">{SEO_DESCRIPTION}</p>
+            <p className="rt-hero-lede mx-auto max-w-xl text-sm leading-relaxed">{SEO_DESCRIPTION}</p>
             <p className="tabular mt-2 text-xs text-ink-soft">{storeStats(entries)}</p>
           </div>
         </div>
@@ -56,6 +58,7 @@ export default function Home() {
             <Duotone id="road-hero" width={1800} height={1319} />
           </div>
           <p className="rt-scroll-cue">Scroll</p>
+        </div>
         </div>
         <HeroScroll />
       </header>

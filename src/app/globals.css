@@ -177,29 +177,38 @@ option {
   mix-blend-mode: lighten;
 }
 
-/* Hero: fills the first screen (100svh). Centred text on navy above, the photo full-bleed in the lower part, a static
+/* Hero: its frame fills the first screen (100svh). Centred text on navy above, the photo full-bleed in the lower part, a static
    "Scroll" label at its foot. This is also the static hero: no JS, reduced motion and print get exactly this (print
    drops the photo).
    The one signature movement (only with html.rt-anim on a screen, which the <head> script sets unless reduced motion
-   is preferred): over the first half screen of scroll the headline halves ease apart ("Billy Reid" up-left, "Road Trip"
-   down-right, 8vw on phones, 10vw from 768px, sized so they never leave the screen), and over the first screen the
-   photo layer drifts at 0.85x scroll speed (the one parallax allowed, inside the hero only). Transform/translate only:
-   the layer is taller than its frame by 15svh, so the drift never uncovers an edge and nothing else moves. */
+   is preferred): the frame sticks for a runway of 140svh (see heroConfig.ts for every threshold). The headline holds
+   still, then its halves ease apart ("Billy Reid" up-left, "Road Trip" down-right, 8vw on phones, 10vw from 768px,
+   never off screen); the kicker, paragraph and store count fade after that and the headline last. The photo layer
+   drifts over the runway (the one parallax allowed, inside the hero only). Transform and opacity only: the layer is
+   taller than its frame by 15svh, so the drift never uncovers an edge and nothing else moves. */
 .rt-hero {
   --rt-dx: 8vw;
   --rt-dy: 0.12em;
-  --rt-drift: 15svh; /* 0.15 x one screen of scroll = 0.85x scroll speed */
+  --rt-drift: 15svh; /* the photo layer is 15svh taller than its frame; it drifts down by that over the runway */
   position: relative;
+  overflow-x: clip; /* belt and braces: the parting halves can never add a sideways scroll */
+}
+.rt-hero-frame {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100svh;
-  overflow-x: clip; /* belt and braces: the parting halves can never add a sideways scroll */
 }
 @media (min-width: 768px) {
   .rt-hero {
     --rt-dx: 10vw;
   }
+}
+.rt-hero-h1 {
+  margin-top: clamp(1.25rem, 3svh, 1.5rem); /* kicker to headline: 1.5x the old 1rem */
+}
+.rt-hero-lede {
+  margin-top: clamp(1.5rem, 3.5svh, 1.875rem); /* headline to paragraph: 1.5x the old 1.25rem */
 }
 .rt-hero-text {
   padding-top: clamp(1.5rem, 6svh, 4.5rem);
@@ -254,7 +263,7 @@ option {
 }
 
 @media print {
-  .rt-hero {
+  .rt-hero-frame {
     min-height: 0;
   }
   .rt-hero-media {
@@ -263,22 +272,36 @@ option {
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {
+  /* Runway: the hero is one screen plus --rt-runway tall and its frame sticks for that distance, so the map starts
+     right after it with no gap. All the thresholds are custom properties set from heroConfig.ts. */
+  html.rt-anim .rt-hero {
+    height: calc(100svh + var(--rt-runway));
+  }
+  html.rt-anim .rt-hero-frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
   html.rt-anim .rt-hero-drift {
     will-change: transform;
   }
 
-  /* Scroll-driven animations: no JS. The split eases out; the drift tracks the scroll linearly. */
+  /* Scroll-driven animations: no JS. Hold, then the split eases out; the copy and headline fade in stages (opacity
+     only); the drift tracks the scroll linearly over the whole runway. */
   @supports (animation-timeline: scroll()) {
     html.rt-anim .rt-hero-a,
     html.rt-anim .rt-hero-b,
-    html.rt-anim .rt-hero-drift {
+    html.rt-anim .rt-hero-drift,
+    html.rt-anim .rt-hero-h1,
+    html.rt-anim .rt-hero-kicker,
+    html.rt-anim .rt-hero-copy {
       animation-fill-mode: both;
       animation-timeline: scroll(root block);
     }
     html.rt-anim .rt-hero-a,
     html.rt-anim .rt-hero-b {
       animation-timing-function: ease-out;
-      animation-range: 0 50svh;
+      animation-range: calc(var(--rt-runway) * var(--rt-hold)) calc(var(--rt-runway) * var(--rt-split-end));
     }
     html.rt-anim .rt-hero-a {
       animation-name: rt-split-a;
@@ -286,18 +309,33 @@ option {
     html.rt-anim .rt-hero-b {
       animation-name: rt-split-b;
     }
+    html.rt-anim .rt-hero-h1,
+    html.rt-anim .rt-hero-kicker,
+    html.rt-anim .rt-hero-copy {
+      animation-name: rt-fade-out;
+      animation-timing-function: linear;
+    }
+    html.rt-anim .rt-hero-kicker,
+    html.rt-anim .rt-hero-copy {
+      animation-range: calc(var(--rt-runway) * var(--rt-copy-start)) calc(var(--rt-runway) * var(--rt-fade-end));
+    }
+    html.rt-anim .rt-hero-h1 {
+      animation-range: calc(var(--rt-runway) * var(--rt-head-start)) calc(var(--rt-runway) * var(--rt-fade-end));
+    }
     html.rt-anim .rt-hero-drift {
       animation-name: rt-drift;
       animation-timing-function: linear;
-      animation-range: 0 100svh;
+      animation-range: 0 var(--rt-runway);
     }
   }
 
-  /* Fallback: HeroScroll sets --p (0 to 1) and --y (px) on .rt-hero; the split gets a 500ms ease-out transition. */
+  /* Fallback: HeroScroll sets --r, --p, --c, --h on .rt-hero; the split gets a 500ms ease-out transition. */
   @supports not (animation-timeline: scroll()) {
     html.rt-anim .rt-hero {
+      --r: 0;
       --p: 0;
-      --y: 0px;
+      --c: 1;
+      --h: 1;
     }
     html.rt-anim .rt-hero-a {
       translate: calc(var(--p) * var(--rt-dx) * -1) calc(var(--p) * var(--rt-dy) * -1);
@@ -309,8 +347,15 @@ option {
     html.rt-anim .rt-hero-b {
       transition: translate 500ms ease-out;
     }
+    html.rt-anim .rt-hero-h1 {
+      opacity: var(--h);
+    }
+    html.rt-anim .rt-hero-kicker,
+    html.rt-anim .rt-hero-copy {
+      opacity: var(--c);
+    }
     html.rt-anim .rt-hero-drift {
-      transform: translateY(calc(var(--y) * 0.15));
+      transform: translateY(calc(var(--r) * var(--rt-drift)));
     }
   }
 }
@@ -329,6 +374,14 @@ option {
   }
   to {
     translate: var(--rt-dx) var(--rt-dy);
+  }
+}
+@keyframes rt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 @keyframes rt-drift {
