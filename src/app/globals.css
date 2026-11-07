@@ -178,8 +178,8 @@ option {
 }
 
 /* Hero: its frame fills the first screen (100svh). Centred text on navy above, the photo full-bleed in the lower part, a static
-   "Scroll" label at its foot. This is also the static hero: no JS, reduced motion and print get exactly this (print
-   drops the photo).
+   scroll arrow at its foot (only with the scroll effect on). This is also the static hero: no JS, reduced motion and
+   print get exactly this, without the arrow (print drops the photo).
    The one signature movement (only with html.rt-anim on a screen, which the <head> script sets unless reduced motion
    is preferred): the frame sticks for a runway of 140svh (see heroConfig.ts for every threshold). The headline holds
    still, then its halves ease apart ("Billy Reid" up-left, "Road Trip" down-right, 8vw on phones, 10vw from 768px,
@@ -249,18 +249,22 @@ option {
   object-fit: cover;
   object-position: 50% 22%; /* keeps the truck whole in wide, short frames */
 }
+/* Scroll arrow: decorative, only rendered with the scroll effect on (see the media block below); hidden otherwise. */
 .rt-scroll-cue {
+  display: none;
   position: absolute;
-  bottom: 0.75rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
   translate: -50% 0;
-  padding: 0.25rem 0.625rem;
-  background: var(--page);
+  padding: 0.5rem 0.5rem; /* the faint navy scrim: cream alone disappears against the pale road */
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--page) 70%, transparent);
   color: var(--cream);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  pointer-events: none; /* a label, never a control; it sits in the aria-hidden media */
+  line-height: 0;
+  pointer-events: none; /* never a control; it sits in the aria-hidden media */
+}
+.rt-scroll-cue svg {
+  display: block;
 }
 
 @media print {
@@ -295,8 +299,7 @@ option {
     html.rt-anim .rt-hero-drift,
     html.rt-anim .rt-hero-h1,
     html.rt-anim .rt-hero-kicker,
-    html.rt-anim .rt-hero-copy,
-    html.rt-anim .rt-scroll-cue {
+    html.rt-anim .rt-hero-copy {
       animation-fill-mode: both;
       animation-timeline: scroll(root block);
     }
@@ -324,11 +327,6 @@ option {
     html.rt-anim .rt-hero-h1 {
       animation-range: calc(var(--rt-runway) * var(--rt-head-start)) calc(var(--rt-runway) * var(--rt-fade-end));
     }
-    html.rt-anim .rt-scroll-cue {
-      animation-name: rt-fade-out;
-      animation-timing-function: ease-out;
-      animation-range: 0 calc(var(--rt-runway) * var(--rt-cue-end));
-    }
     html.rt-anim .rt-hero-drift {
       animation-name: rt-drift;
       animation-timing-function: linear;
@@ -336,18 +334,36 @@ option {
     }
   }
 
-  /* Fallback: HeroScroll sets --r, --p, --c, --h, --q on .rt-hero; the split gets a 500ms ease-out transition. */
+  /* Scroll arrow: one gentle nudge on load (transform and opacity, once), then HeroScroll adds .rt-cue-gone the first
+     time the page scrolls past HERO_CUE_HIDE_AT and it fades out over 150ms for the rest of the visit. */
+  html.rt-anim .rt-scroll-cue {
+    display: block;
+    transition: opacity 150ms ease-out;
+  }
+  html.rt-anim .rt-scroll-cue svg {
+    animation: rt-cue-nudge 700ms ease-out 1 both;
+  }
+  html.rt-anim .rt-hero.rt-cue-gone .rt-scroll-cue {
+    opacity: 0;
+  }
+  @keyframes rt-cue-nudge {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fallback: HeroScroll sets --r, --p, --c, --h on .rt-hero; the split gets a 500ms ease-out transition. */
   @supports not (animation-timeline: scroll()) {
     html.rt-anim .rt-hero {
       --r: 0;
       --p: 0;
       --c: 1;
       --h: 1;
-      --q: 1;
-    }
-    html.rt-anim .rt-scroll-cue {
-      opacity: var(--q);
-      transition: opacity 160ms ease-out;
     }
     html.rt-anim .rt-hero-a {
       translate: calc(var(--p) * var(--rt-dx) * -1) calc(var(--p) * var(--rt-dy) * -1);

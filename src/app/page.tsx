@@ -57,7 +57,11 @@ export default function Home() {
           <div className="rt-hero-drift">
             <Duotone id="road-hero" width={1800} height={1319} />
           </div>
-          <p className="rt-scroll-cue">Scroll</p>
+          <div className="rt-scroll-cue">
+            <svg viewBox="0 0 20 28" width="20" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 3v20M3.5 16.5 10 23l6.5-6.5" />
+            </svg>
+          </div>
         </div>
         </div>
         <HeroScroll />
