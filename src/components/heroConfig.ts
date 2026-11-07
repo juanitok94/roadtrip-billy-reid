@@ -13,6 +13,8 @@ export const HERO_SPLIT_END = 0.7
 export const HERO_COPY_FADE_START = 0.4
 /** The headline stays fully opaque until here, then fades. */
 export const HERO_HEADLINE_FADE_START = 0.6
+/** The "Scroll" cue is fully faded by here. */
+export const HERO_CUE_FADE_END = 0.05
 /** Everything has finished fading here. */
 export const HERO_FADE_END = 0.9
 
@@ -23,4 +25,5 @@ export const heroCssVars = {
   '--rt-copy-start': HERO_COPY_FADE_START,
   '--rt-head-start': HERO_HEADLINE_FADE_START,
   '--rt-fade-end': HERO_FADE_END,
+  '--rt-cue-end': HERO_CUE_FADE_END,
 } as Record<string, string | number>

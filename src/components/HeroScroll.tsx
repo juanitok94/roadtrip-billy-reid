@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import {
+  HERO_CUE_FADE_END,
   HERO_COPY_FADE_START,
   HERO_FADE_END,
   HERO_HEADLINE_FADE_START,
@@ -17,6 +18,7 @@ import {
 //   --p  0 to 1 across the headline split (hold, then ease apart)
 //   --c  opacity of kicker, paragraph and store count
 //   --h  opacity of the headline
+//   --q  opacity of the "Scroll" cue
 // Only scrollY is read per frame; the screen height is read on resize. It does nothing when the effect is off (no
 // html.rt-anim: reduced motion or no JS) or when the browser animates by itself.
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n))
@@ -36,6 +38,7 @@ export default function HeroScroll() {
       hero.style.setProperty('--r', t.toFixed(3))
       hero.style.setProperty('--p', span(t, HERO_HOLD_END, HERO_SPLIT_END).toFixed(3))
       hero.style.setProperty('--c', (1 - span(t, HERO_COPY_FADE_START, HERO_FADE_END)).toFixed(3))
+      hero.style.setProperty('--q', (1 - span(t, 0, HERO_CUE_FADE_END)).toFixed(3))
       hero.style.setProperty('--h', (1 - span(t, HERO_HEADLINE_FADE_START, HERO_FADE_END)).toFixed(3))
     }
     const schedule = () => {

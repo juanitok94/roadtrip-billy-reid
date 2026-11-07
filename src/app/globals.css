@@ -260,6 +260,7 @@ option {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  pointer-events: none; /* a label, never a control; it sits in the aria-hidden media */
 }
 
 @media print {
@@ -294,7 +295,8 @@ option {
     html.rt-anim .rt-hero-drift,
     html.rt-anim .rt-hero-h1,
     html.rt-anim .rt-hero-kicker,
-    html.rt-anim .rt-hero-copy {
+    html.rt-anim .rt-hero-copy,
+    html.rt-anim .rt-scroll-cue {
       animation-fill-mode: both;
       animation-timeline: scroll(root block);
     }
@@ -322,6 +324,11 @@ option {
     html.rt-anim .rt-hero-h1 {
       animation-range: calc(var(--rt-runway) * var(--rt-head-start)) calc(var(--rt-runway) * var(--rt-fade-end));
     }
+    html.rt-anim .rt-scroll-cue {
+      animation-name: rt-fade-out;
+      animation-timing-function: ease-out;
+      animation-range: 0 calc(var(--rt-runway) * var(--rt-cue-end));
+    }
     html.rt-anim .rt-hero-drift {
       animation-name: rt-drift;
       animation-timing-function: linear;
@@ -329,13 +336,18 @@ option {
     }
   }
 
-  /* Fallback: HeroScroll sets --r, --p, --c, --h on .rt-hero; the split gets a 500ms ease-out transition. */
+  /* Fallback: HeroScroll sets --r, --p, --c, --h, --q on .rt-hero; the split gets a 500ms ease-out transition. */
   @supports not (animation-timeline: scroll()) {
     html.rt-anim .rt-hero {
       --r: 0;
       --p: 0;
       --c: 1;
       --h: 1;
+      --q: 1;
+    }
+    html.rt-anim .rt-scroll-cue {
+      opacity: var(--q);
+      transition: opacity 160ms ease-out;
     }
     html.rt-anim .rt-hero-a {
       translate: calc(var(--p) * var(--rt-dx) * -1) calc(var(--p) * var(--rt-dy) * -1);
