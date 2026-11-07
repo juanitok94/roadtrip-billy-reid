@@ -289,6 +289,9 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   // Until the visitor reorders by hand, adding a stop re-runs the suggested order from the start stop (the first one).
   // A trip that arrived in a link with two or more stops keeps the order it came with.
   const [manualOrder, setManualOrder] = useState(false)
+  // The stop the visitor just added: its trip line legs draw themselves and its order badges pop in. Set only by
+  // "Add to trip", so a trip that arrives in a link appears without motion.
+  const [freshStop, setFreshStop] = useState<string | null>(null)
   const fromLink = useRef<boolean | null>(null)
   const keepsOrder = () => {
     fromLink.current ??= trip.ids.length > 1
@@ -319,6 +322,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
     }
     const added = [...trip.ids, id]
     const ids = keepsOrder() ? added : suggestOrder(added.map((x) => byId.get(x)!), added[0])
+    setFreshStop(id)
     writeTrip(ids, `Added ${nameOf(id)} as stop ${ids.indexOf(id) + 1}.`)
   }
 
@@ -428,6 +432,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
             layout={layout}
             entries={mapStops}
             trip={trip.ids}
+            freshStop={freshStop}
             selectedId={selected?.id ?? null}
             linkedId={linked?.from === 'row' ? linked.id : null}
             onLink={(id, on) => link(id, 'pin', on)}
@@ -448,6 +453,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
 
       <TripPanel
         stops={tripStops}
+        freshStop={freshStop}
         ignored={trip.ignored}
         sharedPlaces={sharedPlaces}
         open={tripOpen ?? tripStops.length > 0}

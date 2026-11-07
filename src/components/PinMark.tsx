@@ -40,20 +40,23 @@ export function PinMark({ type, number, active }: { type: StoreType; number: num
 }
 
 // A pin on the trip carries its order in a small square at its top right, outlined in --page so it reads on any pin.
-export function TripBadge({ n }: { n: number }) {
+// `pop`: it scales in over 150ms (the stop was just added).
+export function TripBadge({ n, pop = false }: { n: number; pop?: boolean }) {
   const w = n > 9 ? 18 : 14
   return (
     <g transform={`translate(${SIZE - 1} ${-SIZE - 3})`}>
-      <rect x={-w / 2} y={-7} width={w} height={14} fill="var(--ink)" stroke="var(--page)" strokeWidth="1.5" />
-      <text
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize="10"
-        fill="var(--page)"
-        style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
-      >
-        {n}
-      </text>
+      <g className={pop ? 'rt-pop' : undefined}>
+        <rect x={-w / 2} y={-7} width={w} height={14} fill="var(--ink)" stroke="var(--page)" strokeWidth="1.5" />
+        <text
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize="10"
+          fill="var(--page)"
+          style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}
+        >
+          {n}
+        </text>
+      </g>
     </g>
   )
 }

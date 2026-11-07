@@ -75,6 +75,7 @@ export default function UsMap({
   layout,
   entries,
   trip,
+  freshStop,
   selectedId,
   linkedId,
   onLink,
@@ -87,6 +88,7 @@ export default function UsMap({
   layout: MapLayout
   entries: ListedStop[]
   trip: string[] // trip stop ids in order
+  freshStop: string | null // just added: its legs draw themselves, its badge pops in
   selectedId: string | null
   linkedId: string | null // a list row is hovered or focused: its pin lights up
   onLink: (id: string, on: boolean) => void // this pin is hovered or focused: its row lights up
@@ -290,17 +292,19 @@ export default function UsMap({
               {legs.map(([a, b]) => {
                 const p = spots.get(a)!
                 const q = spots.get(b)!
+                const key = `${a}-${b}`
+                const ends = { x1: p.x, y1: p.y, x2: q.x, y2: q.y }
+                const line = <line {...ends} stroke="var(--accent-text)" strokeWidth="2" strokeDasharray={TRIP_DASH} />
+                if (a !== freshStop && b !== freshStop) return <g key={key}>{line}</g>
+                // A new leg draws itself from its first stop: a solid line in a mask grows along it (stroke-dashoffset
+                // over 500ms) and uncovers the dashed one.
                 return (
-                  <line
-                    key={`${a}-${b}`}
-                    x1={p.x}
-                    y1={p.y}
-                    x2={q.x}
-                    y2={q.y}
-                    stroke="var(--accent-text)"
-                    strokeWidth="2"
-                    strokeDasharray={TRIP_DASH}
-                  />
+                  <g key={key}>
+                    <mask id={`rt-leg-${key}`} maskUnits="userSpaceOnUse" x="0" y="0" width={pxW} height={pxH}>
+                      <line {...ends} stroke="#fff" strokeWidth="6" pathLength={1} strokeDasharray="1 1" className="rt-leg-reveal" />
+                    </mask>
+                    <g mask={`url(#rt-leg-${key})`}>{line}</g>
+                  </g>
                 )
               })}
             </g>
@@ -343,7 +347,7 @@ export default function UsMap({
                   <g className="rt-pin-drop" style={{ '--i': i } as React.CSSProperties}>
                     {pinShape(d.storeType, selected ? PIN_RING_SELECTED : PIN_RING, { className: 'rt-ring' })}
                     <PinMark type={d.storeType} number={d.number} active={selected} />
-                    {order !== null && <TripBadge n={order} />}
+                    {order !== null && <TripBadge n={order} pop={d.id === freshStop} />}
                   </g>
                 </g>
               </g>

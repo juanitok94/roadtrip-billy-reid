@@ -16,11 +16,35 @@ export type TripActions = {
   clear: () => void
 }
 
-function Badge({ n }: { n: number }) {
+// The total ticks from its old value to the new one over 300ms (eased out), and jumps under reduced motion.
+function useTicker(target: number, ms = 300): number {
+  const [shown, setShown] = useState(target)
+  const from = useRef(target)
+  useEffect(() => {
+    const start = from.current
+    if (start === target) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let frame = 0
+    let t0: number | null = null
+    const step = (now: number) => {
+      t0 ??= now
+      const t = reduce ? 1 : Math.min(1, (now - t0) / ms)
+      const v = t === 1 ? target : start + (target - start) * (1 - (1 - t) ** 3)
+      from.current = v
+      setShown(v)
+      if (t < 1) frame = requestAnimationFrame(step)
+    }
+    frame = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(frame)
+  }, [target, ms])
+  return shown
+}
+
+function Badge({ n, pop }: { n: number; pop: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="tabular flex h-7 w-7 shrink-0 items-center justify-center bg-ink text-sm text-page print:border print:border-ink"
+      className={`tabular flex h-7 w-7 shrink-0 items-center justify-center bg-ink text-sm text-page print:border print:border-ink ${pop ? 'rt-pop' : ''}`}
     >
       {n}
     </span>
@@ -29,6 +53,7 @@ function Badge({ n }: { n: number }) {
 
 export default function TripPanel({
   stops,
+  freshStop,
   ignored,
   sharedPlaces,
   open,
@@ -38,6 +63,7 @@ export default function TripPanel({
   actions,
 }: {
   stops: ListedStop[]
+  freshStop: string | null // just added: its badge pops in
   ignored: number // ids in the link that aren't in this guide
   sharedPlaces: Set<string>
   open: boolean
@@ -47,6 +73,10 @@ export default function TripPanel({
   actions: TripActions
 }) {
   const [copyStatus, setCopyStatus] = useState('')
+  // "Copy trip link" reads "Copied" for 2 seconds after a successful copy.
+  const [copied, setCopied] = useState(false)
+  const copiedTimer = useRef<number | undefined>(undefined)
+  useEffect(() => () => window.clearTimeout(copiedTimer.current), [])
   // After a move or removal the control used may have moved or gone; focus follows the stop (or the heading).
   const focusNext = useRef<string | null>(null)
   const ids = stops.map((d) => d.id).join(',')
@@ -61,6 +91,7 @@ export default function TripPanel({
   const legs = legMiles(stops)
   const measured = legs.filter((m): m is number => m !== null)
   const total = measured.reduce((a, b) => a + b, 0)
+  const shownTotal = useTicker(total)
   const unmeasured = legs.length - measured.length
   const mappedCount = stops.filter(hasCoords).length
   const name = (d: ListedStop) => shortName(d, sharedPlaces.has(placeLabel(d)))
@@ -91,6 +122,9 @@ export default function TripPanel({
     try {
       await navigator.clipboard.writeText(url)
       setCopyStatus('Trip link copied.')
+      setCopied(true)
+      window.clearTimeout(copiedTimer.current)
+      copiedTimer.current = window.setTimeout(() => setCopied(false), 2000)
     } catch {
       setCopyStatus("Couldn't copy. The address bar has the trip link.")
     }
@@ -148,7 +182,7 @@ export default function TripPanel({
                 return (
                   <li key={d.id} id={`trip-${d.id}`} tabIndex={-1} className="rt-row py-3">
                     <div className="flex items-start gap-3">
-                      <Badge n={i + 1} />
+                      <Badge n={i + 1} pop={d.id === freshStop} />
                       <div className="min-w-0 flex-1 space-y-1">
                         <p className="font-serif text-lg leading-snug font-semibold">
                           <span className="sr-only">Stop {i + 1}: </span>
@@ -233,7 +267,7 @@ export default function TripPanel({
               ) : (
                 <>
                   <p className="tabular">
-                    Total: approx. {formatMi(total)} mi <span className="text-ink-soft">(approx. straight-line, not driving distance)</span>
+                    Total: approx. {formatMi(shownTotal)} mi <span className="text-ink-soft">(approx. straight-line, not driving distance)</span>
                   </p>
                   {unmeasured > 0 && (
                     <p className="text-xs text-ink-soft">
@@ -251,7 +285,21 @@ export default function TripPanel({
                 </button>
               )}
               <button type="button" onClick={copyLink} className={OUTLINE_BUTTON}>
-                Copy trip link
+                {/* Both labels share one grid cell, so the button keeps its width and nothing beside it moves. */}
+                <span className="grid">
+                  <span
+                    aria-hidden={copied}
+                    className={`col-start-1 row-start-1 transition-opacity duration-150 ease-out ${copied ? 'opacity-0' : ''}`}
+                  >
+                    Copy trip link
+                  </span>
+                  <span
+                    aria-hidden={!copied}
+                    className={`col-start-1 row-start-1 text-center transition-opacity duration-150 ease-out ${copied ? '' : 'opacity-0'}`}
+                  >
+                    Copied
+                  </span>
+                </span>
               </button>
               <button type="button" onClick={printTrip} className={OUTLINE_BUTTON}>
                 Print trip
