@@ -4,7 +4,7 @@
 **Folder:** `C:\roadtrip-billy-reid` (create it, start Claude Code inside it)
 **Template (read only, never modified):** `C:\bourbon-guide` (newest map-family code: config-driven map, region zoom, URL state, brands/search)
 **Source:** Billy Reid "Our Stores" page (billyreid.com), pasted Nov 5, 2026. Seed data is in `data/stops.json` and `data/map.json`.
-**Status:** Planning. Prompts R1 to R5 in ROADTRIP-CC-PROMPTS.md.
+**Status (Nov 7, 2026):** Built and deployed on Vercel from main as a noindex prototype: map, list, dropdown filters, trip builder, scroll-driven hero, open-licensed duotone photo, alive pass (load-in, hover, pin-row link, trip animation). In progress: designer pass on the hero.
 
 ## 1. Purpose
 Help someone plan a drive that hits several Billy Reid stores: see them on a U.S. map, filter by region and experience, pick stops, get an ordered route with approximate distance, and open real directions in their own maps app. Reference-only; no commerce.
@@ -64,3 +64,6 @@ Accounts, ratings, reviews, product info, pricing, appointment booking, real dri
 1. Site name (see section 3).
 2. Whether the Outlet and the custom showroom show by default or behind a "store type" filter (recommended: shown, clearly labeled).
 3. Whether to add stockists later.
+
+## 11. Git
+Commit after checks pass and push to main. Vercel deploys from main. Never force-push. Never run git in C:\bourbon-guide.

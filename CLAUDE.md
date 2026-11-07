@@ -41,4 +41,4 @@ Prototype phase: noindex (robots meta, robots.txt disallow, no sitemap) unless N
 Straight-line (haversine) only, always labeled "approx. straight-line". Real driving directions open in the visitor's own maps app via a link built from the store address.
 
 ## Git
-Commit locally when asked. Push only when the user does it.
+Commit after checks pass and push to main. Vercel deploys from main. Never force-push. Never run git in C:\bourbon-guide.
