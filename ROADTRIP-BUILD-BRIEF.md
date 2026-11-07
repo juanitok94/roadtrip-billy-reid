@@ -57,6 +57,13 @@ Own look, not Wine & Gold. Dark navy, dark only (no toggle; `color-scheme: dark`
 - Everything else is small and quick (120 to 200 ms): pin and row hover, pin-row highlight, trip line draw, button easing, a one-time load-in. No cursor-following, autoplay or looping motion.
 - Reduced motion, no-JS and print get a static hero that looks complete on its own.
 
+## 7b. Images
+- Texture only (hero, 404), never next to a store row. Every file in public/images has a record in src/data/images.json (id, file, alt, creator, dateCreated, location, sourceUrl https, rightsStatement copied exactly, license, verifiedOn, usedOn); check:data enforces it.
+- Allowed sources: Public Domain or CC0 only, first choice Library of Congress FSA/OWI (loc.gov). Nothing from billyreid.com.
+- Reject recognizable faces, readable business names, signs or license plates, and hardship scenes. View at full size before use; prefer the TIFF master and resize for the web.
+- All photos share the navy and cream duotone. The footer credits the real place and photographer, without implying the South or any affiliation.
+- In use: Dorothea Lange, Nyssa Heights, Oregon, 1939 (truck with milk cans on a dirt road), hero and 404. Backup checked and set aside: Paul Carter, Bear Notch Road, New Hampshire, 1936 (a license plate is readable at full size).
+
 ## 8. Out of scope for v1
 Accounts, ratings, reviews, product info, pricing, appointment booking, real driving routing (links out only), photos, logos.
 

@@ -30,39 +30,36 @@ export default function Home() {
   const titleTop = words.length > 2 ? words.slice(0, -2).join(' ') : MAP.title
   const titleBottom = words.length > 2 ? words.slice(-2).join(' ') : ''
   return (
-    <main className="mx-auto max-w-5xl px-4 pt-4 md:pt-12">
+    <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: homeJsonLd(entries) }} />
+      {/* The hero fills the first screen: centred text on navy above, the photo full-bleed below. See .rt-hero in
+          globals.css for the scroll move (the halves part, the photo drifts) and the static version. */}
       <header className="rt-no-print rt-hero">
-        <div className="rt-hero-stage">
+        <div className="rt-hero-text mx-auto w-full max-w-5xl px-4 text-center">
           <p className="text-[11px] leading-snug tracking-[0.18em] text-accent-text">{MAP.kicker}</p>
-          <div className="rt-hero-title">
-            {/* The full title stays the accessible name; the two halves are decoration for the scroll effect. */}
-            <h1 aria-label={MAP.title} className="mt-3 font-serif text-[42px] leading-[1.02] font-semibold tracking-tight md:text-7xl">
-              <span aria-hidden="true" className="rt-hero-a">
-                <Words text={titleTop} from={0} />
-              </span>{' '}
-              <span aria-hidden="true" className="rt-hero-b">
-                <Words text={titleBottom} from={titleTop.split(' ').length} />
-              </span>
-            </h1>
-            <Duotone id="road-hero" width={1600} height={535} className="rt-hero-img" />
-          </div>
-          <div className="rt-hero-swap">
-            <div className="rt-hero-copy">
-              <p className="mt-3 max-w-2xl text-sm leading-normal md:mt-4 md:leading-relaxed">{SEO_DESCRIPTION}</p>
-              <p className="tabular mt-3 text-xs text-ink-soft">{storeStats(entries)}</p>
-            </div>
-            <ul aria-hidden="true" className="rt-hero-prompts">
-              <li>Pick a state</li>
-              <li>Plot a route</li>
-              <li>Add a stop</li>
-            </ul>
+          {/* The full title stays the accessible name; the two halves are decoration for the scroll effect. */}
+          <h1 aria-label={MAP.title} className="rt-hero-h1 mt-4 font-serif font-semibold">
+            <span aria-hidden="true" className="rt-hero-a">
+              <Words text={titleTop} from={0} />
+            </span>{' '}
+            <span aria-hidden="true" className="rt-hero-b">
+              <Words text={titleBottom} from={titleTop.split(' ').length} />
+            </span>
+          </h1>
+          <div className="rt-hero-copy">
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed">{SEO_DESCRIPTION}</p>
+            <p className="tabular mt-2 text-xs text-ink-soft">{storeStats(entries)}</p>
           </div>
         </div>
-        <div aria-hidden="true" className="rt-hero-spacer" />
+        <div aria-hidden="true" className="rt-hero-media">
+          <div className="rt-hero-drift">
+            <Duotone id="road-hero" width={1800} height={1319} />
+          </div>
+          <p className="rt-scroll-cue">Scroll</p>
+        </div>
         <HeroScroll />
       </header>
-      <div className="mt-6">
+      <div className="mx-auto max-w-5xl px-4 pt-8">
         <Explorer entries={entries} layout={layout} />
       </div>
     </main>

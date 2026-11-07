@@ -145,8 +145,9 @@ option {
   opacity: 1;
 }
 
-/* Duotone photo, navy and cream: greyscale, highlights tinted --cream (multiply), shadows lifted to --surface (screen). Tokens only, so the pair
-   follows the theme. The photo is decorative; it carries no information the text doesn't. */
+/* Duotone photo, navy and cream: greyscale, tinted --cream (multiply: white becomes cream, mid-tones stay warm), then
+   floored at --surface (lighten: the darks become navy, nothing lighter is touched, so no blue cast over the mid-tones).
+   Tokens only, so the pair follows the theme. The photo is decorative; it carries no information the text doesn't. */
 .rt-duo {
   position: relative;
   display: block;
@@ -173,245 +174,172 @@ option {
 }
 .rt-duo::after {
   background: var(--surface);
-  mix-blend-mode: screen;
+  mix-blend-mode: lighten;
 }
 
-/* Hero. Static by default: headline whole, photo below it, prompts hidden. The scroll effect needs all of: a screen,
-   no prefers-reduced-motion, and html.rt-anim (set by a tiny script in <head> before first paint, so there is no layout
-   shift). No JS, reduced motion and print therefore get the static hero.
-   Extra scroll height: 56vh run (38vh on phones) + 6vh above and 6vh below the headline (room for the halves to travel) = 68vh (the
-   budget is 70vh), all removed in the static hero. Stages over the 56vh run (p = 0 to 1): headline halves move apart (0 to 0.5), copy fades out (0 to 0.25),
-   photo fades in between the halves (0.45 to 0.7), prompts fade in one after another (0.68 to 0.96). */
+/* Hero: fills the first screen (100svh). Centred text on navy above, the photo full-bleed in the lower part, a static
+   "Scroll" label at its foot. This is also the static hero: no JS, reduced motion and print get exactly this (print
+   drops the photo).
+   The one signature movement (only with html.rt-anim on a screen, which the <head> script sets unless reduced motion
+   is preferred): over the first half screen of scroll the headline halves ease apart ("Billy Reid" up-left, "Road Trip"
+   down-right, 8vw on phones, 10vw from 768px, sized so they never leave the screen), and over the first screen the
+   photo layer drifts at 0.85x scroll speed (the one parallax allowed, inside the hero only). Transform/translate only:
+   the layer is taller than its frame by 15svh, so the drift never uncovers an edge and nothing else moves. */
 .rt-hero {
-  --rt-img-h: clamp(4.25rem, 12vh, 8rem); /* the gap between the halves is 2 x --rt-dy = 12vh */
   --rt-dx: 8vw;
-  --rt-dy: 6vh;
-  --rt-run: 56vh;
+  --rt-dy: 0.12em;
+  --rt-drift: 15svh; /* 0.15 x one screen of scroll = 0.85x scroll speed */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: clip; /* belt and braces: the parting halves can never add a sideways scroll */
 }
-/* Phones: a shorter run, so the top of the map shows on the first screen (375x667 and up). */
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .rt-hero {
-    --rt-run: 38vh;
+    --rt-dx: 10vw;
   }
 }
-.rt-hero-title {
+.rt-hero-text {
+  padding-top: clamp(1.5rem, 6svh, 4.5rem);
+  padding-bottom: clamp(1.25rem, 4svh, 2.5rem);
+}
+/* About three quarters of the width at 375px for the longer half (so 8vw of travel still leaves a margin), capped on
+   wide screens. */
+.rt-hero-h1 {
+  font-size: clamp(2.5rem, 16vw, 8.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.rt-hero-a,
+.rt-hero-b {
+  display: block;
+  width: fit-content; /* only as wide as the words, so moving sideways never adds a scrollbar */
+  margin-inline: auto;
+}
+.rt-hero-media {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 38svh;
+  overflow: hidden;
+  background: var(--page);
 }
-.rt-hero-img {
-  margin-top: 1rem;
-  height: var(--rt-img-h);
+.rt-hero-drift {
+  position: absolute;
+  top: calc(var(--rt-drift) * -1);
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
-.rt-hero-img img {
+.rt-hero-drift .rt-duo {
+  height: 100%;
+}
+.rt-hero-drift .rt-duo img {
   height: 100%;
   object-fit: cover;
-  object-position: 50% 75%;
+  object-position: 50% 30%;
 }
-.rt-hero-prompts,
-.rt-hero-spacer {
-  display: none;
+.rt-scroll-cue {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.25rem 0.625rem;
+  background: var(--page);
+  color: var(--cream);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 @media print {
-  .rt-hero-img {
+  .rt-hero {
+    min-height: 0;
+  }
+  .rt-hero-media {
     display: none;
   }
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {
-  html.rt-anim .rt-hero-spacer {
-    display: block;
-    height: var(--rt-run);
-  }
-  html.rt-anim .rt-hero-stage {
-    position: sticky;
-    top: 1rem;
-  }
-  /* Room for the halves to travel into, so they never land on the kicker, the copy or the map. */
-  html.rt-anim .rt-hero-title {
-    margin-top: calc(var(--rt-dy) + 0.25rem);
-  }
-  html.rt-anim .rt-hero-a,
-  html.rt-anim .rt-hero-b {
-    display: block;
-    width: fit-content; /* the box is only as wide as the words, so moving it right never makes the page scroll sideways */
-  }
-  html.rt-anim .rt-hero-a {
-    margin-left: var(--rt-dx); /* starts indented so "up-left" ends flush with the column, never past it */
-  }
-  html.rt-anim .rt-hero-img {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    left: 0;
-    margin-top: calc(var(--rt-img-h) / -2);
-    opacity: 0;
-    pointer-events: none;
-  }
-  /* Copy and prompts share one grid cell, so swapping them changes nothing. */
-  html.rt-anim .rt-hero-swap {
-    display: grid;
-    margin-top: var(--rt-dy);
-  }
-  html.rt-anim .rt-hero-copy,
-  html.rt-anim .rt-hero-prompts {
-    grid-area: 1 / 1;
-  }
-  html.rt-anim .rt-hero-prompts {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 0.25rem 1.5rem;
-    margin-top: 1rem;
-    font-size: 0.875rem;
-    list-style: none;
-  }
-  html.rt-anim .rt-hero-prompts li {
-    opacity: 0;
-  }
-  html.rt-anim .rt-hero-prompts li::before {
-    content: "→ ";
-    color: var(--accent-text);
+  html.rt-anim .rt-hero-drift {
+    will-change: transform;
   }
 
-  /* Scroll-driven animations: no JS. Each segment eases out. */
+  /* Scroll-driven animations: no JS. The split eases out; the drift tracks the scroll linearly. */
   @supports (animation-timeline: scroll()) {
     html.rt-anim .rt-hero-a,
     html.rt-anim .rt-hero-b,
-    html.rt-anim .rt-hero-copy,
-    html.rt-anim .rt-hero-img,
-    html.rt-anim .rt-hero-prompts li {
+    html.rt-anim .rt-hero-drift {
       animation-fill-mode: both;
-      animation-timing-function: ease-out;
       animation-timeline: scroll(root block);
-      animation-range: 0 var(--rt-run);
+    }
+    html.rt-anim .rt-hero-a,
+    html.rt-anim .rt-hero-b {
+      animation-timing-function: ease-out;
+      animation-range: 0 50svh;
     }
     html.rt-anim .rt-hero-a {
-      animation-name: rt-up-left;
+      animation-name: rt-split-a;
     }
     html.rt-anim .rt-hero-b {
-      animation-name: rt-down-right;
+      animation-name: rt-split-b;
     }
-    html.rt-anim .rt-hero-copy {
-      animation-name: rt-fade-out;
-    }
-    html.rt-anim .rt-hero-img {
-      animation-name: rt-photo-in;
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(1) {
-      animation-name: rt-prompt-1;
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(2) {
-      animation-name: rt-prompt-2;
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(3) {
-      animation-name: rt-prompt-3;
+    html.rt-anim .rt-hero-drift {
+      animation-name: rt-drift;
+      animation-timing-function: linear;
+      animation-range: 0 100svh;
     }
   }
 
-  /* Fallback: a passive scroll listener sets --p (0 to 1) on .rt-hero; transitions give the 500ms ease-out. */
+  /* Fallback: HeroScroll sets --p (0 to 1) and --y (px) on .rt-hero; the split gets a 500ms ease-out transition. */
   @supports not (animation-timeline: scroll()) {
     html.rt-anim .rt-hero {
       --p: 0;
-      --m: clamp(0, calc(var(--p) * 2), 1);
+      --y: 0px;
     }
     html.rt-anim .rt-hero-a {
-      translate: calc(var(--m) * var(--rt-dx) * -1) calc(var(--m) * var(--rt-dy) * -1);
+      translate: calc(var(--p) * var(--rt-dx) * -1) calc(var(--p) * var(--rt-dy) * -1);
     }
     html.rt-anim .rt-hero-b {
-      translate: calc(var(--m) * var(--rt-dx)) calc(var(--m) * var(--rt-dy));
-    }
-    html.rt-anim .rt-hero-copy {
-      opacity: clamp(0, calc(1 - var(--p) * 4), 1);
-    }
-    html.rt-anim .rt-hero-img {
-      opacity: clamp(0, calc((var(--p) - 0.45) * 4), 1);
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(1) {
-      opacity: clamp(0, calc((var(--p) - 0.68) * 8), 1);
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(2) {
-      opacity: clamp(0, calc((var(--p) - 0.76) * 8), 1);
-    }
-    html.rt-anim .rt-hero-prompts li:nth-child(3) {
-      opacity: clamp(0, calc((var(--p) - 0.84) * 8), 1);
+      translate: calc(var(--p) * var(--rt-dx)) calc(var(--p) * var(--rt-dy));
     }
     html.rt-anim .rt-hero-a,
-    html.rt-anim .rt-hero-b,
-    html.rt-anim .rt-hero-copy,
-    html.rt-anim .rt-hero-img,
-    html.rt-anim .rt-hero-prompts li {
-      transition: translate 500ms ease-out, opacity 500ms ease-out;
+    html.rt-anim .rt-hero-b {
+      transition: translate 500ms ease-out;
+    }
+    html.rt-anim .rt-hero-drift {
+      transform: translateY(calc(var(--y) * 0.15));
     }
   }
 }
 
-@keyframes rt-up-left {
-  0% {
+@keyframes rt-split-a {
+  from {
     translate: 0 0;
   }
-  50%,
-  100% {
+  to {
     translate: calc(var(--rt-dx) * -1) calc(var(--rt-dy) * -1);
   }
 }
-@keyframes rt-down-right {
-  0% {
+@keyframes rt-split-b {
+  from {
     translate: 0 0;
   }
-  50%,
-  100% {
+  to {
     translate: var(--rt-dx) var(--rt-dy);
   }
 }
-@keyframes rt-fade-out {
-  0% {
-    opacity: 1;
+@keyframes rt-drift {
+  from {
+    transform: none;
   }
-  25%,
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes rt-photo-in {
-  0%,
-  45% {
-    opacity: 0;
-  }
-  70%,
-  100% {
-    opacity: 1;
+  to {
+    transform: translateY(var(--rt-drift));
   }
 }
-@keyframes rt-prompt-1 {
-  0%,
-  68% {
-    opacity: 0;
-  }
-  76%,
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes rt-prompt-2 {
-  0%,
-  76% {
-    opacity: 0;
-  }
-  84%,
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes rt-prompt-3 {
-  0%,
-  84% {
-    opacity: 0;
-  }
-  92%,
-  100% {
-    opacity: 1;
-  }
-}
+
 
 /* Hover and focus: small and quick (120 to 200ms, ease-out), transform and opacity only, nothing moves its neighbours.
    Hover rules sit under (hover: hover), so a tap never leaves a hover look behind; focus gets the same look from the

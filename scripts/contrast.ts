@@ -41,7 +41,7 @@ export function textPairs(t: Tokens): Pair[] {
     pairOf(t, '--page', '--ink', 'primary buttons, selected pin number'),
     pairOf(t, '--page', '--ink-hover', 'hovered primary button'),
     pairOf(t, '--page', '--accent-text', 'pin numbers'),
-    pairOf(t, '--cream', '--page', 'cream type'),
+    pairOf(t, '--cream', '--page', 'cream type; the Scroll label sits on a solid --page chip over the hero photo'),
     pairOf(t, '--cream', '--surface', 'cream type on a surface'),
   ]
 }
