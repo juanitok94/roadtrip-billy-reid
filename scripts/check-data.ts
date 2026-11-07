@@ -58,6 +58,10 @@ if (MAP.virtualStore?.verifiedOn) {
 // --- images.json: every file in public/images has a record, and every record a file, an allowed licence and an https source
 const IMG_DIR = join(process.cwd(), 'public/images')
 const imgFiles = existsSync(IMG_DIR) ? readdirSync(IMG_DIR).filter((f) => !f.startsWith('.')) : []
+// Social preview images live at the public root (served at /og.jpg); the same rules apply to them.
+const PUBLIC_DIR = join(process.cwd(), 'public')
+const rootImgFiles = readdirSync(PUBLIC_DIR).filter((f) => /\.(jpe?g|png|webp|gif|avif)$/i.test(f))
+for (const f of rootImgFiles) if (!IMAGES.some((r) => r.file === f)) errors.push(`images: public/${f} has no record in images.json`)
 const imgIds = new Set<string>()
 for (const f of imgFiles) if (!IMAGES.some((r) => r.file === f)) errors.push(`images: public/images/${f} has no record in images.json`)
 for (const r of IMAGES) {
@@ -65,7 +69,7 @@ for (const r of IMAGES) {
   if (blank(r.id)) errors.push(`${at}: missing id`)
   else if (imgIds.has(r.id)) errors.push(`${at}: duplicate id`)
   else imgIds.add(r.id)
-  if (!imgFiles.includes(r.file)) errors.push(`${at}: file public/images/${r.file} does not exist`)
+  if (!imgFiles.includes(r.file) && !rootImgFiles.includes(r.file)) errors.push(`${at}: file public/images/${r.file} (or public/${r.file}) does not exist`)
   for (const k of ['alt', 'creator', 'dateCreated', 'location', 'rightsStatement'] as const)
     if (blank(r[k])) errors.push(`${at}: missing ${k}`)
   if (!ALLOWED_LICENSES.includes(r.license)) errors.push(`${at}: license must be one of ${ALLOWED_LICENSES.join(', ')} (got "${r.license}")`)

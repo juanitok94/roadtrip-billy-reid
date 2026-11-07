@@ -13,7 +13,9 @@
     "rightsStatement": "No known restrictions. For information, see U.S. Farm Security Administration/Office of War Information Black & White Photographs http://www.loc.gov/rr/print/res/071_fsab.html",
     "license": "Public Domain",
     "verifiedOn": "2026-11-07",
-    "usedOn": ["home"]
+    "usedOn": [
+      "home"
+    ]
   },
   {
     "id": "road-404",
@@ -29,6 +31,26 @@
     "rightsStatement": "No known restrictions. For information, see U.S. Farm Security Administration/Office of War Information Black & White Photographs http://www.loc.gov/rr/print/res/071_fsab.html",
     "license": "Public Domain",
     "verifiedOn": "2026-11-07",
-    "usedOn": ["404"]
+    "usedOn": [
+      "404"
+    ]
+  },
+  {
+    "id": "og-social",
+    "file": "og.jpg",
+    "title": "The cream truck coming down the road represents one steady element in the new settlers' income. Nyssa Heights, Malheur County, Oregon",
+    "alt": "A flatbed truck loaded with milk cans on a long dirt road across flat sagebrush country, in navy and cream tones.",
+    "creator": "Dorothea Lange",
+    "dateCreated": "1939 Oct.",
+    "location": "Nyssa Heights, Oregon",
+    "collection": "Library of Congress, FSA/OWI",
+    "callNumber": "LC-USF34- 021440-E [P&P] LOT 319 (corresponding photographic print)",
+    "sourceUrl": "https://www.loc.gov/pictures/item/2017773853/",
+    "rightsStatement": "No known restrictions. For information, see U.S. Farm Security Administration/Office of War Information Black & White Photographs http://www.loc.gov/rr/print/res/071_fsab.html",
+    "license": "Public Domain",
+    "verifiedOn": "2026-11-07",
+    "usedOn": [
+      "social preview"
+    ]
   }
 ]
