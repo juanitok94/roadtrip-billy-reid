@@ -20,7 +20,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Turns the scroll effect on before first paint (so nothing shifts) unless the visitor prefers reduced motion. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('rt-anim')}catch(e){}",
+          }}
+        />
+      </head>
       <body>
         {children}
         <SiteFooter />

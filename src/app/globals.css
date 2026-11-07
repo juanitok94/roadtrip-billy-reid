@@ -179,6 +179,237 @@ option {
   mix-blend-mode: screen;
 }
 
+/* Hero. Static by default: headline whole, photo below it, prompts hidden. The scroll effect needs all of: a screen,
+   no prefers-reduced-motion, and html.rt-anim (set by a tiny script in <head> before first paint, so there is no layout
+   shift). No JS, reduced motion and print therefore get the static hero.
+   Extra scroll height: 56vh run + 6vh above and 6vh below the headline (room for the halves to travel) = 68vh (the
+   budget is 70vh), all removed in the static hero. Stages over the 56vh run (p = 0 to 1): headline halves move apart (0 to 0.5), copy fades out (0 to 0.25),
+   photo fades in between the halves (0.45 to 0.7), prompts fade in one after another (0.68 to 0.96). */
+.rt-hero {
+  --rt-img-h: clamp(4.25rem, 12vh, 8rem); /* the gap between the halves is 2 x --rt-dy = 12vh */
+  --rt-dx: 8vw;
+  --rt-dy: 6vh;
+  --rt-run: 56vh;
+}
+.rt-hero-title {
+  position: relative;
+}
+.rt-hero-img {
+  margin-top: 1rem;
+  height: var(--rt-img-h);
+}
+.rt-hero-img img {
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 75%;
+}
+.rt-hero-prompts,
+.rt-hero-spacer {
+  display: none;
+}
+
+@media print {
+  .rt-hero-img {
+    display: none;
+  }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  html.rt-anim .rt-hero-spacer {
+    display: block;
+    height: var(--rt-run);
+  }
+  html.rt-anim .rt-hero-stage {
+    position: sticky;
+    top: 1rem;
+  }
+  /* Room for the halves to travel into, so they never land on the kicker, the copy or the map. */
+  html.rt-anim .rt-hero-title {
+    margin-top: calc(var(--rt-dy) + 0.25rem);
+  }
+  html.rt-anim .rt-hero-a,
+  html.rt-anim .rt-hero-b {
+    display: block;
+    width: fit-content; /* the box is only as wide as the words, so moving it right never makes the page scroll sideways */
+  }
+  html.rt-anim .rt-hero-a {
+    margin-left: var(--rt-dx); /* starts indented so "up-left" ends flush with the column, never past it */
+  }
+  html.rt-anim .rt-hero-img {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    margin-top: calc(var(--rt-img-h) / -2);
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* Copy and prompts share one grid cell, so swapping them changes nothing. */
+  html.rt-anim .rt-hero-swap {
+    display: grid;
+    margin-top: var(--rt-dy);
+  }
+  html.rt-anim .rt-hero-copy,
+  html.rt-anim .rt-hero-prompts {
+    grid-area: 1 / 1;
+  }
+  html.rt-anim .rt-hero-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.25rem 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    list-style: none;
+  }
+  html.rt-anim .rt-hero-prompts li {
+    opacity: 0;
+  }
+  html.rt-anim .rt-hero-prompts li::before {
+    content: "→ ";
+    color: var(--accent-text);
+  }
+
+  /* Scroll-driven animations: no JS. Each segment eases out. */
+  @supports (animation-timeline: scroll()) {
+    html.rt-anim .rt-hero-a,
+    html.rt-anim .rt-hero-b,
+    html.rt-anim .rt-hero-copy,
+    html.rt-anim .rt-hero-img,
+    html.rt-anim .rt-hero-prompts li {
+      animation-fill-mode: both;
+      animation-timing-function: ease-out;
+      animation-timeline: scroll(root block);
+      animation-range: 0 var(--rt-run);
+    }
+    html.rt-anim .rt-hero-a {
+      animation-name: rt-up-left;
+    }
+    html.rt-anim .rt-hero-b {
+      animation-name: rt-down-right;
+    }
+    html.rt-anim .rt-hero-copy {
+      animation-name: rt-fade-out;
+    }
+    html.rt-anim .rt-hero-img {
+      animation-name: rt-photo-in;
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(1) {
+      animation-name: rt-prompt-1;
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(2) {
+      animation-name: rt-prompt-2;
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(3) {
+      animation-name: rt-prompt-3;
+    }
+  }
+
+  /* Fallback: a passive scroll listener sets --p (0 to 1) on .rt-hero; transitions give the 500ms ease-out. */
+  @supports not (animation-timeline: scroll()) {
+    html.rt-anim .rt-hero {
+      --p: 0;
+      --m: clamp(0, calc(var(--p) * 2), 1);
+    }
+    html.rt-anim .rt-hero-a {
+      translate: calc(var(--m) * var(--rt-dx) * -1) calc(var(--m) * var(--rt-dy) * -1);
+    }
+    html.rt-anim .rt-hero-b {
+      translate: calc(var(--m) * var(--rt-dx)) calc(var(--m) * var(--rt-dy));
+    }
+    html.rt-anim .rt-hero-copy {
+      opacity: clamp(0, calc(1 - var(--p) * 4), 1);
+    }
+    html.rt-anim .rt-hero-img {
+      opacity: clamp(0, calc((var(--p) - 0.45) * 4), 1);
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(1) {
+      opacity: clamp(0, calc((var(--p) - 0.68) * 8), 1);
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(2) {
+      opacity: clamp(0, calc((var(--p) - 0.76) * 8), 1);
+    }
+    html.rt-anim .rt-hero-prompts li:nth-child(3) {
+      opacity: clamp(0, calc((var(--p) - 0.84) * 8), 1);
+    }
+    html.rt-anim .rt-hero-a,
+    html.rt-anim .rt-hero-b,
+    html.rt-anim .rt-hero-copy,
+    html.rt-anim .rt-hero-img,
+    html.rt-anim .rt-hero-prompts li {
+      transition: translate 500ms ease-out, opacity 500ms ease-out;
+    }
+  }
+}
+
+@keyframes rt-up-left {
+  0% {
+    translate: 0 0;
+  }
+  50%,
+  100% {
+    translate: calc(var(--rt-dx) * -1) calc(var(--rt-dy) * -1);
+  }
+}
+@keyframes rt-down-right {
+  0% {
+    translate: 0 0;
+  }
+  50%,
+  100% {
+    translate: var(--rt-dx) var(--rt-dy);
+  }
+}
+@keyframes rt-fade-out {
+  0% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes rt-photo-in {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  70%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes rt-prompt-1 {
+  0%,
+  68% {
+    opacity: 0;
+  }
+  76%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes rt-prompt-2 {
+  0%,
+  76% {
+    opacity: 0;
+  }
+  84%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes rt-prompt-3 {
+  0%,
+  84% {
+    opacity: 0;
+  }
+  92%,
+  100% {
+    opacity: 1;
+  }
+}
+
 /* Print stays light: white paper, black text, no map backgrounds. */
 @media print {
   :root {
