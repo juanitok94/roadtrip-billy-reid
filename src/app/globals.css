@@ -208,7 +208,7 @@ option {
 /* About three quarters of the width at 375px for the longer half (so 8vw of travel still leaves a margin), capped on
    wide screens. */
 .rt-hero-h1 {
-  font-size: clamp(2.5rem, 16vw, 8.5rem);
+  font-size: clamp(2.5rem, min(16vw, 16svh), 8.5rem); /* the height cap keeps short laptop screens in proportion */
   line-height: 0.95;
   letter-spacing: -0.02em;
 }
@@ -238,7 +238,7 @@ option {
 .rt-hero-drift .rt-duo img {
   height: 100%;
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 22%; /* keeps the truck whole in wide, short frames */
 }
 .rt-scroll-cue {
   position: absolute;
