@@ -196,7 +196,7 @@ export default function TripPanel({
                       </div>
                     </div>
                     {next && (
-                      <p className="rt-no-print mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 pl-10 text-xs text-ink-soft">
+                      <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 pl-10 text-xs text-ink-soft">
                         <span className="tabular">
                           <span aria-hidden="true">↓ </span>
                           {leg != null ? (
@@ -211,7 +211,7 @@ export default function TripPanel({
                             target="_blank"
                             rel="noopener"
                             aria-label={`Directions from ${name(d)} to ${name(next)} (opens in a new tab)`}
-                            className="inline-flex min-h-11 items-center text-accent-text underline underline-offset-2 hover:text-ink-hover"
+                            className="rt-no-print inline-flex min-h-11 items-center text-accent-text underline underline-offset-2 hover:text-ink-hover"
                           >
                             Directions
                           </a>
@@ -223,13 +223,13 @@ export default function TripPanel({
               })}
             </ol>
 
-            <div className="rt-no-print mt-3 space-y-1 text-sm">
+            <div className="mt-3 space-y-1 text-sm">
               {stops.length === 1 ? (
-                <p className="text-ink-soft">Add another stop to see distances.</p>
+                <p className="rt-no-print text-ink-soft">Add another stop to see distances.</p>
               ) : mappedCount === 0 ? (
-                <p className="text-ink-soft">None of these stops are on the map yet, so there are no distances.</p>
+                <p className="rt-no-print text-ink-soft">None of these stops are on the map yet, so there are no distances.</p>
               ) : measured.length === 0 ? (
-                <p className="text-ink-soft">No distances yet: every leg has a stop that is not on the map yet.</p>
+                <p className="rt-no-print text-ink-soft">No distances yet: every leg has a stop that is not on the map yet.</p>
               ) : (
                 <>
                   <p className="tabular">
