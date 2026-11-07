@@ -29,7 +29,7 @@ export default function Home() {
                 {titleBottom}
               </span>
             </h1>
-            <Duotone id="road-hero" width={822} height={274} className="rt-hero-img" />
+            <Duotone id="road-hero" width={1600} height={535} className="rt-hero-img" />
           </div>
           <div className="rt-hero-swap">
             <div className="rt-hero-copy">

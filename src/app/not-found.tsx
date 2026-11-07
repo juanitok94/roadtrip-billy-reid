@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <ErrorScreen label="404" headline="That page isn't on the map." image={{ id: 'road-404', width: 822, height: 509 }}>
+    <ErrorScreen label="404" headline="That page isn't on the map." image={{ id: 'road-404', width: 1600, height: 994 }}>
       <Link href="/" className={PRIMARY}>
         Back to the guide
       </Link>
