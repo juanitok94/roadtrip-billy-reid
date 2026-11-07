@@ -14,7 +14,7 @@ export default function Home() {
   const titleTop = words.length > 2 ? words.slice(0, -2).join(' ') : MAP.title
   const titleBottom = words.length > 2 ? words.slice(-2).join(' ') : ''
   return (
-    <main className="mx-auto max-w-5xl px-4 pt-8 md:pt-12">
+    <main className="mx-auto max-w-5xl px-4 pt-4 md:pt-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: homeJsonLd(entries) }} />
       <header className="rt-no-print rt-hero">
         <div className="rt-hero-stage">
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
           <div className="rt-hero-swap">
             <div className="rt-hero-copy">
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed">{SEO_DESCRIPTION}</p>
+              <p className="mt-3 max-w-2xl text-sm leading-normal md:mt-4 md:leading-relaxed">{SEO_DESCRIPTION}</p>
               <p className="tabular mt-3 text-xs text-ink-soft">{storeStats(entries)}</p>
             </div>
             <ul aria-hidden="true" className="rt-hero-prompts">

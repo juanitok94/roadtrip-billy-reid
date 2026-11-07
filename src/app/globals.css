@@ -185,7 +185,7 @@ option {
 /* Hero. Static by default: headline whole, photo below it, prompts hidden. The scroll effect needs all of: a screen,
    no prefers-reduced-motion, and html.rt-anim (set by a tiny script in <head> before first paint, so there is no layout
    shift). No JS, reduced motion and print therefore get the static hero.
-   Extra scroll height: 56vh run + 6vh above and 6vh below the headline (room for the halves to travel) = 68vh (the
+   Extra scroll height: 56vh run (38vh on phones) + 6vh above and 6vh below the headline (room for the halves to travel) = 68vh (the
    budget is 70vh), all removed in the static hero. Stages over the 56vh run (p = 0 to 1): headline halves move apart (0 to 0.5), copy fades out (0 to 0.25),
    photo fades in between the halves (0.45 to 0.7), prompts fade in one after another (0.68 to 0.96). */
 .rt-hero {
@@ -193,6 +193,12 @@ option {
   --rt-dx: 8vw;
   --rt-dy: 6vh;
   --rt-run: 56vh;
+}
+/* Phones: a shorter run, so the top of the map shows on the first screen (375x667 and up). */
+@media (max-width: 767px) {
+  .rt-hero {
+    --rt-run: 38vh;
+  }
 }
 .rt-hero-title {
   position: relative;
