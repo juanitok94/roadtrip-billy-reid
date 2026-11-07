@@ -4,7 +4,8 @@
    Tokens are defined once, here. npm run check:contrast prints every pair; check:data fails if one drops below AA.
    Dark only, no toggle. --accent is for fills, rules and large text only; --accent-text wherever the colour has to be
    read (links, small text, pins). --line draws map state outlines and control borders. --hairline is far below 3:1,
-   so it never bounds a control. */
+   so it never bounds a control. --cream is the warm highlight from the original palette: duotone highlights and
+   occasional type on --page. */
 :root {
   --page: #0B1626;
   --surface: #14253D;
@@ -14,6 +15,7 @@
   --accent: #5B8FD6;
   --accent-text: #8DB4EC;
   --line: #6F86A6;
+  --cream: #F3EDE1;
   --hairline: rgba(232, 238, 247, 0.14);
   color-scheme: dark;
 }
@@ -27,6 +29,7 @@
   --color-accent: var(--accent);
   --color-accent-text: var(--accent-text);
   --color-line: var(--line);
+  --color-cream: var(--cream);
   --color-hairline: var(--hairline);
 }
 
@@ -148,7 +151,7 @@ option {
   opacity: 1;
 }
 
-/* Duotone photo: greyscale, tinted with --ink (multiply), shadows lifted to --surface (screen). Tokens only, so the pair
+/* Duotone photo, navy and cream: greyscale, highlights tinted --cream (multiply), shadows lifted to --surface (screen). Tokens only, so the pair
    follows the theme. The photo is decorative; it carries no information the text doesn't. */
 .rt-duo {
   position: relative;
@@ -161,7 +164,7 @@ option {
   display: block;
   width: 100%;
   height: auto;
-  filter: grayscale(1) contrast(1.05);
+  filter: grayscale(1) brightness(1.22) contrast(1.12); /* the scans top out near 78% grey; lift them so highlights reach cream */
 }
 .rt-duo::before,
 .rt-duo::after {
@@ -171,7 +174,7 @@ option {
   pointer-events: none;
 }
 .rt-duo::before {
-  background: var(--ink);
+  background: var(--cream);
   mix-blend-mode: multiply;
 }
 .rt-duo::after {
@@ -421,6 +424,7 @@ option {
     --accent: #1F3A5F;
     --accent-text: #1F3A5F;
     --line: #666666;
+    --cream: #FFFFFF;
     --hairline: rgba(0, 0, 0, 0.2);
     color-scheme: light;
   }
