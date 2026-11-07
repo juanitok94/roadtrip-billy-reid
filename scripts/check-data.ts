@@ -1,8 +1,9 @@
 // Validates src/data/map.json and src/data/stops.json. Run: npm run check:data (also runs before every build).
 // --verbose lists every warning. Fails (exit 1) on rule violations; warns on details still to be filled in.
-import { readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { MAP, STORE_TYPES, type Stop } from '../src/data/types'
+import { ALLOWED_LICENSES, IMAGES } from '../src/lib/images'
 import { computeLayout, project, stateBounds } from '../src/lib/map-layout'
 import { minTarget, type Rect } from '../src/lib/map-view'
 import { STATE_NAMES } from '../src/lib/states'
@@ -52,6 +53,25 @@ if (MAP.virtualStore && (blank(MAP.virtualStore.name) || !Array.isArray(MAP.virt
 if (MAP.virtualStore?.verifiedOn) {
   if (!DATE.test(MAP.virtualStore.verifiedOn)) errors.push('map.json: virtualStore verifiedOn must be YYYY-MM-DD')
   if (!MAP.virtualStore.sourceUrl?.startsWith('https://')) errors.push('map.json: virtualStore verifiedOn is set but sourceUrl is missing or not https://')
+}
+
+// --- images.json: every file in public/images has a record, and every record a file, an allowed licence and an https source
+const IMG_DIR = join(process.cwd(), 'public/images')
+const imgFiles = existsSync(IMG_DIR) ? readdirSync(IMG_DIR).filter((f) => !f.startsWith('.')) : []
+const imgIds = new Set<string>()
+for (const f of imgFiles) if (!IMAGES.some((r) => r.file === f)) errors.push(`images: public/images/${f} has no record in images.json`)
+for (const r of IMAGES) {
+  const at = `images: ${r.id ?? '(no id)'}`
+  if (blank(r.id)) errors.push(`${at}: missing id`)
+  else if (imgIds.has(r.id)) errors.push(`${at}: duplicate id`)
+  else imgIds.add(r.id)
+  if (!imgFiles.includes(r.file)) errors.push(`${at}: file public/images/${r.file} does not exist`)
+  for (const k of ['alt', 'creator', 'dateCreated', 'location', 'rightsStatement'] as const)
+    if (blank(r[k])) errors.push(`${at}: missing ${k}`)
+  if (!ALLOWED_LICENSES.includes(r.license)) errors.push(`${at}: license must be one of ${ALLOWED_LICENSES.join(', ')} (got "${r.license}")`)
+  if (blank(r.sourceUrl) || !r.sourceUrl.startsWith('https://')) errors.push(`${at}: sourceUrl must start with https://`)
+  if (blank(r.verifiedOn) || !DATE.test(r.verifiedOn)) errors.push(`${at}: verifiedOn must be YYYY-MM-DD`)
+  if (!Array.isArray(r.usedOn)) errors.push(`${at}: usedOn must be an array`)
 }
 
 // --- stops.json

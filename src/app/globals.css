@@ -148,6 +148,37 @@ option {
   opacity: 1;
 }
 
+/* Duotone photo: greyscale, tinted with --ink (multiply), shadows lifted to --surface (screen). Tokens only, so the pair
+   follows the theme. The photo is decorative; it carries no information the text doesn't. */
+.rt-duo {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--page);
+}
+.rt-duo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.05);
+}
+.rt-duo::before,
+.rt-duo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.rt-duo::before {
+  background: var(--ink);
+  mix-blend-mode: multiply;
+}
+.rt-duo::after {
+  background: var(--surface);
+  mix-blend-mode: screen;
+}
+
 /* Print stays light: white paper, black text, no map backgrounds. */
 @media print {
   :root {

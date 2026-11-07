@@ -1,4 +1,5 @@
 import { MAP } from '@/data/types'
+import { photoCredits } from '@/lib/images'
 import { formatDate, latestVerified } from '@/lib/site'
 import { VISITOR_STOPS } from '@/lib/stops'
 
@@ -16,6 +17,11 @@ export default function SiteFooter() {
         {/* "Print trip" keeps only the unofficial line above. */}
         <p className="rt-no-print tabular">{latest ? `Last verified: ${formatDate(latest)}` : 'Stores not yet verified'}</p>
         {MAP.virtualStore && <p className="rt-no-print">{VIRTUAL}</p>}
+        {photoCredits().map((c) => (
+          <p key={c} className="rt-no-print">
+            {c}
+          </p>
+        ))}
         {MAP.credits.map((c) => (
           <p key={c} className="rt-no-print">
             {c}
