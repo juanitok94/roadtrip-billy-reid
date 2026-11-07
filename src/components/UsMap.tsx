@@ -189,7 +189,7 @@ export default function UsMap({
       <section
         ref={wrapRef}
         aria-label={`Map of stores (${MAP.title}). The list below the map is the accessible alternative to this map.`}
-        className="border border-hairline"
+        className="rt-intro-map border border-hairline"
       >
         <svg ref={svgRef} viewBox={`0 0 ${pxW} ${pxH}`} className="block h-auto w-full">
           <svg x="0" y="0" width={pxW} height={pxH} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}>
@@ -294,7 +294,7 @@ export default function UsMap({
             </g>
           )}
 
-          {stops.map((d) => {
+          {stops.map((d, i) => {
             const s = spots.get(d.id)
             if (!s) return null
             const selected = d.id === selectedId
@@ -319,9 +319,16 @@ export default function UsMap({
                   : { 'aria-hidden': true })}
               >
                 <rect x={-TARGET_PX / 2} y={-TARGET_PX / 2} width={TARGET_PX} height={TARGET_PX} fill="transparent" />
-                {pinShape(d.storeType, selected ? PIN_RING_SELECTED : PIN_RING, { className: 'rt-ring' })}
-                <PinMark type={d.storeType} number={d.number} active={selected} />
-                {order !== null && <TripBadge n={order} />}
+                {/* Three layers, so no two effects share a transform: the <g> above places the pin, .rt-pin-lift
+                    answers hover and focus, .rt-pin-drop plays the load-in (in list order, via --i). The 44px target
+                    never moves. */}
+                <g className="rt-pin-lift">
+                  <g className="rt-pin-drop" style={{ '--i': i } as React.CSSProperties}>
+                    {pinShape(d.storeType, selected ? PIN_RING_SELECTED : PIN_RING, { className: 'rt-ring' })}
+                    <PinMark type={d.storeType} number={d.number} active={selected} />
+                    {order !== null && <TripBadge n={order} />}
+                  </g>
+                </g>
               </g>
             )
           })}

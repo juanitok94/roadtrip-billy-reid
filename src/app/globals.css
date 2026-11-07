@@ -419,6 +419,66 @@ option {
   }
 }
 
+/* Load-in, once per visit (html.rt-intro, set in <head> and removed after 2s; see layout.tsx). Transform and opacity
+   only, nothing shifts. Headline words rise 12px over 600ms, 80ms apart; the description follows; the map fades in;
+   pins drop in list order (scale from 0.6, 25ms apart, 300ms each: 16 pins finish within 700ms of the first).
+   The words sit inside the scroll-driven halves (.rt-hero-a/b) and the copy's children inside .rt-hero-copy, so the
+   load-in and the scroll effect never animate the same element. */
+.rt-word {
+  display: inline-block;
+}
+.rt-pin-drop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  html.rt-intro .rt-word {
+    animation: rt-rise 600ms ease-out both;
+    animation-delay: calc(var(--w, 0) * 80ms);
+  }
+  html.rt-intro .rt-hero-copy > * {
+    animation: rt-rise 600ms ease-out 320ms both;
+  }
+  html.rt-intro .rt-hero-copy > * + * {
+    animation-delay: 400ms;
+  }
+  html.rt-intro .rt-intro-map {
+    animation: rt-fade-in 500ms ease-out 450ms both;
+  }
+  html.rt-intro .rt-pin-drop {
+    animation: rt-drop 300ms ease-out both;
+    animation-delay: calc(700ms + var(--i, 0) * 25ms);
+  }
+}
+@keyframes rt-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes rt-drop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Print stays light: white paper, black text, no map backgrounds. */
 @media print {
   :root {

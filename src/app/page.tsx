@@ -6,6 +6,22 @@ import { computeLayout } from '@/lib/map-layout'
 import { homeJsonLd, SEO_DESCRIPTION, storeStats } from '@/lib/site'
 import { VISITOR_STOPS } from '@/lib/stops'
 
+// Each word in its own box for the load-in (html.rt-intro). The halves around them carry the scroll effect, so the two
+// never animate the same element.
+function Words({ text, from }: { text: string; from: number }) {
+  return text
+    .split(' ')
+    .filter(Boolean)
+    .map((w, i) => (
+      <span key={i}>
+        {i > 0 && ' '}
+        <span className="rt-word" style={{ '--w': from + i } as React.CSSProperties}>
+          {w}
+        </span>
+      </span>
+    ))
+}
+
 export default function Home() {
   const entries = VISITOR_STOPS
   const layout = computeLayout(entries)
@@ -23,10 +39,10 @@ export default function Home() {
             {/* The full title stays the accessible name; the two halves are decoration for the scroll effect. */}
             <h1 aria-label={MAP.title} className="mt-3 font-serif text-[42px] leading-[1.02] font-semibold tracking-tight md:text-7xl">
               <span aria-hidden="true" className="rt-hero-a">
-                {titleTop}
+                <Words text={titleTop} from={0} />
               </span>{' '}
               <span aria-hidden="true" className="rt-hero-b">
-                {titleBottom}
+                <Words text={titleBottom} from={titleTop.split(' ').length} />
               </span>
             </h1>
             <Duotone id="road-hero" width={1600} height={535} className="rt-hero-img" />

@@ -22,11 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Turns the scroll effect on before first paint (so nothing shifts) unless the visitor prefers reduced motion. */}
+        {/* Before first paint (so nothing shifts), unless the visitor prefers reduced motion: rt-anim turns the scroll effect
+            on; rt-intro plays the load-in once per visit (session), on the home page only, and is removed when it is over
+            so nothing replays. Without JS neither class is set and everything is simply there. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('rt-anim')}catch(e){}",
+              "try{var d=document.documentElement;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('rt-anim');var p=location.pathname;if((p=='/'||p=='/index.html')&&!sessionStorage.getItem('rt-intro')){sessionStorage.setItem('rt-intro','1');d.classList.add('rt-intro');setTimeout(function(){d.classList.remove('rt-intro')},2000)}}}catch(e){}",
           }}
         />
       </head>
