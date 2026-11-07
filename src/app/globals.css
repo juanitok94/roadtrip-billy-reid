@@ -90,9 +90,6 @@ option {
 .rt-row {
   border-bottom: 1px dotted var(--hairline);
 }
-.rt-row-button:hover {
-  box-shadow: inset 3px 0 0 var(--ink-soft);
-}
 .rt-row[data-highlighted] {
   box-shadow: inset 3px 0 0 var(--accent-text);
 }
@@ -115,11 +112,8 @@ option {
   stroke: var(--ink-soft);
   stroke-width: 1px;
   stroke-dasharray: 1 4;
-  transition: fill-opacity 0.15s ease;
 }
-.rt-region:hover .rt-region-box {
-  fill-opacity: 0.08;
-}
+
 .rt-region:focus-visible .rt-region-box {
   fill-opacity: 0.08;
   stroke: var(--accent-text);
@@ -146,7 +140,6 @@ option {
   stroke: var(--accent-text);
   stroke-width: 2px;
 }
-.rt-pin:hover .rt-ring,
 .rt-pin:focus-visible .rt-ring {
   opacity: 1;
 }
@@ -416,6 +409,82 @@ option {
   92%,
   100% {
     opacity: 1;
+  }
+}
+
+/* Hover and focus: small and quick (120 to 200ms, ease-out), transform and opacity only, nothing moves its neighbours.
+   Hover rules sit under (hover: hover), so a tap never leaves a hover look behind; focus gets the same look from the
+   keyboard. Movement (lift, shift) is left out under reduced motion; the opacity cues stay.
+   - Pins: the ring fades in softly and the pin lifts 2px; the 44px target stays put. Focus keeps the ring at full.
+   - Rows: the mark and text slide 4px right and a 1px accent hairline appears at the left edge.
+   - Regions: the box tints and the state outlines inside it brighten (a lighter copy of the outlines fades in). */
+.rt-ring {
+  transition: opacity 160ms ease-out;
+}
+.rt-land-glow {
+  fill: none;
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease-out;
+}
+.rt-region-box {
+  transition: fill-opacity 160ms ease-out;
+}
+.rt-region:focus-visible .rt-land-glow {
+  opacity: 0.7;
+}
+.rt-row-button {
+  position: relative;
+}
+.rt-row-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: var(--accent-text);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease-out;
+}
+.rt-row-button:focus-visible::before {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .rt-pin:hover .rt-ring {
+    opacity: 0.6;
+  }
+  .rt-region:hover .rt-region-box {
+    fill-opacity: 0.08;
+  }
+  .rt-region:hover .rt-land-glow {
+    opacity: 0.7;
+  }
+  .rt-row-button:hover::before {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rt-pin-lift,
+  .rt-row-button > :not(:last-child) {
+    transition: transform 160ms ease-out;
+  }
+  .rt-pin:focus-visible .rt-pin-lift {
+    transform: translateY(-2px);
+  }
+  .rt-row-button:focus-visible > :not(:last-child) {
+    transform: translateX(4px);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .rt-pin:hover .rt-pin-lift {
+    transform: translateY(-2px);
+  }
+  .rt-row-button:hover > :not(:last-child) {
+    transform: translateX(4px);
   }
 }
 

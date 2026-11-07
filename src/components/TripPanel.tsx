@@ -6,7 +6,7 @@ import type { ListedStop } from '@/lib/stops'
 import { formatMi, hasCoords, legDirectionsUrl, legMiles } from '@/lib/trip'
 
 const SMALL_BUTTON =
-  'inline-flex min-h-11 min-w-11 items-center justify-center border border-ink px-3 text-sm text-ink transition-colors hover:bg-ink hover:text-page disabled:cursor-not-allowed disabled:border-hairline disabled:text-ink-soft disabled:hover:bg-transparent'
+  'inline-flex min-h-11 min-w-11 items-center justify-center border border-ink px-3 text-sm text-ink transition-colors duration-150 ease-out hover:border-ink-hover hover:bg-ink hover:text-page disabled:cursor-not-allowed disabled:border-hairline disabled:text-ink-soft disabled:hover:border-hairline disabled:hover:bg-transparent'
 
 export type TripActions = {
   move: (id: string, by: -1 | 1) => void

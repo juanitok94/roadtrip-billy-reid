@@ -2,7 +2,7 @@
 import type { ListedStop } from '@/lib/stops'
 
 export const OUTLINE_BUTTON =
-  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page'
+  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors duration-150 ease-out hover:border-ink-hover hover:bg-ink hover:text-page'
 export const LABEL = 'inline-block border border-hairline px-1.5 py-0.5 text-[11px] leading-tight text-ink-soft'
 export const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>
 export const HOURS_DISCLAIMER = "Hours change; check the store's page before you go."

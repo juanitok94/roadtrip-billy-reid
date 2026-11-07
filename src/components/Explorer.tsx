@@ -73,7 +73,7 @@ function TripToggle({ name, position, onToggle }: { name: string; position: numb
         type="button"
         aria-pressed={on}
         onClick={onToggle}
-        className={`inline-flex min-h-11 items-center gap-1.5 border border-ink px-3 text-sm whitespace-nowrap transition-colors ${
+        className={`inline-flex min-h-11 items-center gap-1.5 border border-ink px-3 text-sm whitespace-nowrap transition-colors duration-150 ease-out hover:border-ink-hover ${
           on ? 'bg-ink text-page hover:bg-ink-hover' : 'text-ink hover:bg-ink hover:text-page'
         }`}
       >
@@ -179,7 +179,7 @@ function SelectControl({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${CONTROL} h-11 cursor-pointer appearance-none truncate pr-9 font-sans leading-tight hover:border-accent-text ${FIELD_TEXT}`}
+          className={`${CONTROL} h-11 cursor-pointer appearance-none truncate pr-9 font-sans leading-tight transition-colors duration-150 ease-out hover:border-accent-text ${FIELD_TEXT}`}
         >
           <option value={ALL}>{allOption}</option>
           {options.map((o) => (

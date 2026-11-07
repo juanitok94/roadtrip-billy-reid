@@ -193,11 +193,18 @@ export default function UsMap({
       >
         <svg ref={svgRef} viewBox={`0 0 ${pxW} ${pxH}`} className="block h-auto w-full">
           <svg x="0" y="0" width={pxW} height={pxH} viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}>
-            <path
-              d={layout.path}
-              className="rt-land"
-              vectorEffect="non-scaling-stroke"
-            />
+            {/* The land is drawn once and reused: as the map itself, and inside each region box as a brighter copy of
+                the state outlines that fades in on hover or focus (clipped to the box). */}
+            <defs>
+              <path id="rt-land-shape" d={layout.path} vectorEffect="non-scaling-stroke" />
+              {!active &&
+                regions.map((r) => (
+                  <clipPath key={r.id} id={`rt-clip-${r.id}`}>
+                    <rect x={r.target.x} y={r.target.y} width={r.target.w} height={r.target.h} />
+                  </clipPath>
+                ))}
+            </defs>
+            <use href="#rt-land-shape" className="rt-land" />
             {!active &&
               regions.map((r) => (
                 <g
@@ -210,6 +217,7 @@ export default function UsMap({
                   onClick={() => zoomTo(r.id)}
                   onKeyDown={(e) => onKey(e, () => zoomTo(r.id))}
                 >
+                  <use href="#rt-land-shape" className="rt-land-glow" clipPath={`url(#rt-clip-${r.id})`} />
                   <rect
                     className="rt-region-box"
                     x={r.target.x}
@@ -343,7 +351,7 @@ export default function UsMap({
                 ref={wholeRef}
                 type="button"
                 onClick={zoomOut}
-                className="min-h-11 border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page"
+                className="min-h-11 border border-ink px-4 text-sm text-ink transition-colors duration-150 ease-out hover:border-ink-hover hover:bg-ink hover:text-page"
               >
                 Whole map
               </button>
