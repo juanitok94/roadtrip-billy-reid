@@ -7,6 +7,10 @@ export const SEO_DESCRIPTION = MAP.seoDescription ?? MAP.kicker
 // The deployed address, set per environment. Without it there is no canonical URL and the sitemap is empty.
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, '') || null
 
+// Prototype phase: search engines are asked to stay away (robots meta noindex, robots.txt disallow, empty sitemap)
+// unless the build sets NEXT_PUBLIC_INDEXABLE=true.
+export const INDEXABLE = process.env.NEXT_PUBLIC_INDEXABLE?.trim() === 'true'
+
 export function formatDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
   if (!y || !m || !d) return iso
