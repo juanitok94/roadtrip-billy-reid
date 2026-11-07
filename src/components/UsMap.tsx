@@ -2,7 +2,7 @@
 
 // The U.S. map, drawn at build time from us-atlas (src/lib/map-layout.ts). No tiles, no map library. Zooming to a
 // region only changes the nested viewBox (instant under prefers-reduced-motion); pins keep their on-screen size.
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type PointerEvent } from 'react'
 import { KeyMark, PIN_RING, PIN_RING_SELECTED, PinMark, TripBadge, pinShape } from '@/components/PinMark'
 import { MAP, STORE_TYPES, storeTypeLabel } from '@/data/types'
 import type { MapLayout, MapRegion } from '@/lib/map-layout'
@@ -76,6 +76,8 @@ export default function UsMap({
   entries,
   trip,
   selectedId,
+  linkedId,
+  onLink,
   onSelect,
   regionId,
   regionCounts,
@@ -86,6 +88,8 @@ export default function UsMap({
   entries: ListedStop[]
   trip: string[] // trip stop ids in order
   selectedId: string | null
+  linkedId: string | null // a list row is hovered or focused: its pin lights up
+  onLink: (id: string, on: boolean) => void // this pin is hovered or focused: its row lights up
   onSelect: (id: string) => void
   regionId: string
   regionCounts: Record<string, number>
@@ -311,6 +315,7 @@ export default function UsMap({
               <g
                 key={d.id}
                 data-pin={d.id}
+                data-linked={d.id === linkedId || undefined}
                 className="rt-pin"
                 transform={`translate(${s.x} ${s.y})`}
                 style={pinsLive ? undefined : { pointerEvents: 'none' }}
@@ -318,6 +323,10 @@ export default function UsMap({
                   ? {
                       role: 'button',
                       tabIndex: 0,
+                      onPointerEnter: (e: PointerEvent<SVGGElement>) => e.pointerType !== 'touch' && onLink(d.id, true),
+                      onPointerLeave: (e: PointerEvent<SVGGElement>) => e.pointerType !== 'touch' && onLink(d.id, false),
+                      onFocus: () => onLink(d.id, true),
+                      onBlur: () => onLink(d.id, false),
                       'aria-label': pinLabel(d, order),
                       'aria-expanded': selected,
                       'aria-controls': selected ? `row-${d.id}-details` : undefined,

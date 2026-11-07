@@ -93,6 +93,8 @@ function Row({
   onMap,
   isExpanded,
   isHighlighted,
+  isLinked,
+  onLink,
   onToggle,
   onShowOnMap,
   tripPosition,
@@ -103,6 +105,8 @@ function Row({
   onMap: boolean
   isExpanded: boolean
   isHighlighted: boolean
+  isLinked: boolean // its pin is hovered or focused
+  onLink: (on: boolean) => void // the row is hovered or focused: light up its pin
   onToggle: () => void
   onShowOnMap: () => void
   tripPosition: number | null // 1-based place in the trip, or null
@@ -115,6 +119,11 @@ function Row({
     <li
       id={`row-${d.id}`}
       data-highlighted={isHighlighted || undefined}
+      data-linked={isLinked || undefined}
+      onPointerEnter={(e) => e.pointerType !== 'touch' && onLink(true)}
+      onPointerLeave={(e) => e.pointerType !== 'touch' && onLink(false)}
+      onFocus={() => onLink(true)}
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && onLink(false)}
       className="rt-row flex scroll-mt-4 flex-wrap md:items-start"
     >
       <button
@@ -199,6 +208,11 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   const [regionTouched, setRegionTouched] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  // The stop whose row or pin is hovered or focused; the other one lights up too.
+  // `from` is the side the visitor is on, so only the other side takes the linked look.
+  const [linked, setLinked] = useState<{ id: string; from: 'row' | 'pin' } | null>(null)
+  const link = (id: string, from: 'row' | 'pin', on: boolean) =>
+    setLinked((cur) => (on ? { id, from } : cur?.id === id && cur.from === from ? null : cur))
   // A scroll to run once the page has rendered the change that asked for it. Always a new object, so repeating one works.
   const [jump, setJump] = useState<{ to: 'map' | 'row' | 'trip'; id: string } | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
@@ -415,6 +429,8 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
             entries={mapStops}
             trip={trip.ids}
             selectedId={selected?.id ?? null}
+            linkedId={linked?.from === 'row' ? linked.id : null}
+            onLink={(id, on) => link(id, 'pin', on)}
             onSelect={selectPin}
             regionId={region}
             regionCounts={regionCounts}
@@ -494,6 +510,8 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
                 onMap={pinIds.has(d.id)}
                 isExpanded={expanded === d.id}
                 isHighlighted={selected?.id === d.id}
+                isLinked={linked?.from === 'pin' && linked.id === d.id}
+                onLink={(on) => link(d.id, 'row', on)}
                 onToggle={() => toggleRow(d.id)}
                 onShowOnMap={() => showOnMap(d)}
                 tripPosition={tripPosition(d.id)}

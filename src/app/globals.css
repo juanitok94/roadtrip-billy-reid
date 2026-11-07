@@ -140,7 +140,8 @@ option {
   stroke: var(--accent-text);
   stroke-width: 2px;
 }
-.rt-pin:focus-visible .rt-ring {
+.rt-pin:focus-visible .rt-ring,
+.rt-pin[data-linked] .rt-ring {
   opacity: 1;
 }
 
@@ -417,7 +418,9 @@ option {
    keyboard. Movement (lift, shift) is left out under reduced motion; the opacity cues stay.
    - Pins: the ring fades in softly and the pin lifts 2px; the 44px target stays put. Focus keeps the ring at full.
    - Rows: the mark and text slide 4px right and a 1px accent hairline appears at the left edge.
-   - Regions: the box tints and the state outlines inside it brighten (a lighter copy of the outlines fades in). */
+   - Regions: the box tints and the state outlines inside it brighten (a lighter copy of the outlines fades in).
+   Pins and rows talk: hovering or focusing one sets data-linked on the other, which takes the same look (the pin's ring
+   at full strength, so it is easy to find on the map). */
 .rt-ring {
   transition: opacity 160ms ease-out;
 }
@@ -450,7 +453,8 @@ option {
   pointer-events: none;
   transition: opacity 160ms ease-out;
 }
-.rt-row-button:focus-visible::before {
+.rt-row-button:focus-visible::before,
+.rt-row[data-linked] .rt-row-button::before {
   opacity: 1;
 }
 @media (hover: hover) {
@@ -472,10 +476,12 @@ option {
   .rt-row-button > :not(:last-child) {
     transition: transform 160ms ease-out;
   }
-  .rt-pin:focus-visible .rt-pin-lift {
+  .rt-pin:focus-visible .rt-pin-lift,
+  .rt-pin[data-linked] .rt-pin-lift {
     transform: translateY(-2px);
   }
-  .rt-row-button:focus-visible > :not(:last-child) {
+  .rt-row-button:focus-visible > :not(:last-child),
+  .rt-row[data-linked] .rt-row-button > :not(:last-child) {
     transform: translateX(4px);
   }
 }
