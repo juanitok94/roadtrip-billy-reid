@@ -19,6 +19,7 @@ Help someone plan a drive that hits several Billy Reid stores: see them on a U.S
 - Unofficial fan guide, trademark line in footer (see CLAUDE.md). No logos, product or campaign images.
 - No selling, affiliate links or reviews. Hours disclaimer on every store card.
 - Not alcohol-related, so no 21+ notice here.
+- 2026-11-07 Owner decision: on-page credits removed, including © OpenStreetMap contributors (ODbL asks for attribution). Revisit before any public launch or partnership.
 - Decision to revisit: using "Billy Reid" in the site title is descriptive use but still their mark. If the brand objects or a partnership is on the table, rename to a neutral title ("Southern Menswear Road Trip") and keep the stores as plain-text facts.
 
 ## 4. Data model
@@ -38,7 +39,7 @@ Every record: sourceUrl (https) + verifiedOn once checked. Virtual store lives i
 3. **Geocode (R3):** Nominatim, accept only inside the right state and matching city.
 4. **Build (R1, R4):** scaffold, map, list, trip builder.
 5. **QA (R5):** compliance, accessibility, mobile.
-6. **Maintain:** re-verify monthly (retail hours change, holiday hours in Nov/Dec especially). Footer shows last verified date. Optional scheduled task to remind you on the 1st.
+6. **Maintain:** re-verify monthly (retail hours change, holiday hours in Nov/Dec especially). Last verified dates live in the data (verifiedOn), not on the page. Optional scheduled task to remind you on the 1st.
 
 ## 6. Page (v1)
 - Hero: kicker, headline, one-line description, stats, computed from stops.json: distinct states, DC counted separately ("16 stores in 10 states and DC").
@@ -46,7 +47,7 @@ Every record: sourceUrl (https) + verifiedOn once checked. Virtual store lives i
 - Filter bar: dropdowns only, no text search: State (distinct states, DC included), Region, Experience (the services values), Store type. Each defaults to "All", has a visible label and a 44px native select. "Showing X of N", a Reset button when any filter is active, and URL state (?state=, ?region=, ?experience=, ?type=). Closed stops are never shown.
 - List as ledger rows (like Bourbon Guide): city/state, hours, services; expands for address, hours note, website, directions link.
 - Trip builder: "Add to trip" on each row and pin. The trip panel shows stops in a suggested order (nearest-neighbor from the stop you pick as start; drag or up/down buttons to reorder), leg distances and total, each labeled "approx. straight-line". "Get directions" links per leg to the visitor's maps app. Trip lives in the URL (?trip=id1,id2,id3) and has a print view.
-- Footer: trademark/unofficial line, hours disclaimer, last verified date, Virtual store mention, credits.
+- Footer: the unofficial line only. Image, map and location credits are kept in the data files (images.json, geocodeSource, map.json credits), not shown on the page.
 
 ## 7. Look
 Own look, not Wine & Gold. Dark navy, dark only (no toggle; `color-scheme: dark`, theme-color #0B1626): --page #0B1626, --surface #14253D (land, inputs), --ink #E8EEF7, --ink-soft #A9B6C8, --accent #5B8FD6 (fills, rules and large text only), --accent-text #8DB4EC (links, small text, pins), --ink-hover #FFFFFF (primary button hover), --line #6F86A6 (map state outlines, input borders). Hairlines (--hairline) are ink at 14% opacity. Primary buttons: --ink fill, --page text. Inputs and selects: --surface fill, --ink text, 1px --line border. Map: land --surface, state outlines --line, region boxes and labels --ink-soft; pins --accent-text with a --page number; the selected pin is larger with an --ink fill, a 3px --accent-text ring and the number in --page (shape by store type is kept, so selection never relies on color). On screens 768px and wider the whole-country map is capped at 65% of the column and centred, with the legend and caption directly under it; on phones it is full width, and a zoomed region uses the full column. Print stays light (white, black text, no map fill). Square corners, 1px rules, ledger-style list, dotted leaders. Fonts self-hosted: Fraunces 600 (headings, names), IBM Plex Mono 500 (labels). No logo, brand fonts or images from billyreid.com. Verify WCAG AA for every text/background pair with `npm run check:contrast` and report ratios.
@@ -61,7 +62,7 @@ Own look, not Wine & Gold. Dark navy, dark only (no toggle; `color-scheme: dark`
 - Texture only (hero, 404), never next to a store row. Every file in public/images has a record in src/data/images.json (id, file, alt, creator, dateCreated, location, sourceUrl https, rightsStatement copied exactly, license, verifiedOn, usedOn); check:data enforces it.
 - Allowed sources: Public Domain or CC0 only, first choice Library of Congress FSA/OWI (loc.gov). Nothing from billyreid.com.
 - Reject recognizable faces, readable business names, signs or license plates, and hardship scenes. View at full size before use; prefer the TIFF master and resize for the web.
-- All photos share the navy and cream duotone. The footer credits the real place and photographer, without implying the South or any affiliation.
+- All photos share the navy and cream duotone. Image records name the real place and photographer, without implying the South or any affiliation; the credit is kept in images.json, not shown on the page.
 - In use: Dorothea Lange, Nyssa Heights, Oregon, 1939 (truck with milk cans on a dirt road), hero and 404. Backup checked and set aside: Paul Carter, Bear Notch Road, New Hampshire, 1936 (a license plate is readable at full size).
 
 ## 8. Out of scope for v1

@@ -6,9 +6,10 @@ A static, map-first guide for planning a road trip through Billy Reid's retail s
 ## Rules (non-negotiable)
 - Every fact has a sourceUrl (https) and verifiedOn date. Unverified = null. Never guess.
 - Sources for store facts: billyreid.com only (locations page and each store's own page). No directories, Yelp, Google summaries, memory.
+- Footer: the unofficial line only. Image, map and location credits are kept in the data files (images.json, geocodeSource, map.json credits), not shown on the page.
 - Unofficial. Footer text: "Unofficial fan guide. Not affiliated with or endorsed by Billy Reid. Billy Reid is a trademark of its owner. Hours change; check the store's page before you go."
 - No Billy Reid logos, wordmark artwork, product, lookbook or campaign images, and no imagery from billyreid.com. Name as plain text only.
-- Images come only from src/data/images.json (Public Domain or CC0). No recognizable faces, readable business signs or hardship scenes. Credit the real place and photographer in the footer. Images are texture (hero, 404), never next to a store row.
+- Images come only from src/data/images.json (Public Domain or CC0). No recognizable faces, readable business signs or hardship scenes. Image records name the real place and photographer and never imply the South or any affiliation. Images are texture (hero, 404), never next to a store row.
 - No selling, affiliate links, ratings, reviews, prices, accounts, analytics.
 - No staff names.
 - Visit/route language only.
