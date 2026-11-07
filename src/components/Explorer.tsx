@@ -2,25 +2,20 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { RowMark } from '@/components/PinMark'
+import TripPanel, { type TripActions } from '@/components/TripPanel'
+import { HOURS_DISCLAIMER, LABEL, NEW_TAB, OUTLINE_BUTTON, placeLabel, shortName, street } from '@/components/ui'
 import UsMap, { MapKey } from '@/components/UsMap'
 import { MAP, STORE_TYPES, storeTypeLabel } from '@/data/types'
 import type { MapLayout } from '@/lib/map-layout'
 import { STATE_NAMES } from '@/lib/states'
 import { padNumber, type ListedStop } from '@/lib/stops'
-import { ALL, notifyUrl, parseChoice, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
+import { parseTrip, suggestOrder } from '@/lib/trip'
+import { ALL, notifyUrl, parseChoice, readParam, readSearch, subscribeToUrl, writeParam, type FilterParam } from '@/lib/url-state'
 
 // Every control in the filter bar shares this: at least 44px tall and one border.
 const CONTROL = 'block min-h-11 w-full border border-line bg-surface px-3 text-ink'
 // Selects stay at 16px on phones, or iOS zooms the page when they take focus.
 const FIELD_TEXT = 'text-base md:text-sm'
-const OUTLINE_BUTTON =
-  'inline-flex min-h-11 items-center border border-ink px-4 text-sm text-ink transition-colors hover:bg-ink hover:text-page'
-const LABEL = 'inline-block border border-hairline px-1.5 py-0.5 text-[11px] leading-tight text-ink-soft'
-const NEW_TAB = <span className="sr-only"> (opens in a new tab)</span>
-const HOURS_DISCLAIMER = "Hours change; check the store's page before you go."
-
-const placeLabel = (d: ListedStop) => (d.city ? `${d.city}, ${d.state}` : 'Location not yet verified')
-const street = (d: ListedStop) => d.address?.split(',')[0] ?? null
 const directionsUrl = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
 
 function Chevron({ className = '' }: { className?: string }) {
@@ -68,6 +63,30 @@ function RowDetails({ d, onMap, onShowOnMap }: { d: ListedStop; onMap: boolean; 
   )
 }
 
+// "Add to trip" is a toggle: its name stays the same and aria-pressed carries the state. Pressed shows a tick, a fill
+// and the stop's place in the trip, so the state is never colour alone.
+function TripToggle({ name, position, onToggle }: { name: string; position: number | null; onToggle: () => void }) {
+  const on = position !== null
+  return (
+    <span className="flex items-center gap-2 md:flex-col md:items-end md:gap-1">
+      <button
+        type="button"
+        aria-pressed={on}
+        onClick={onToggle}
+        className={`inline-flex min-h-11 items-center gap-1.5 border border-ink px-3 text-sm whitespace-nowrap transition-colors ${
+          on ? 'bg-ink text-page hover:bg-ink-hover' : 'text-ink hover:bg-ink hover:text-page'
+        }`}
+      >
+        <span aria-hidden="true" className="inline-block w-3 text-center">
+          {on ? '✓' : '+'}
+        </span>
+        Add to trip<span className="sr-only">: {name}</span>
+      </button>
+      {on && <span className="tabular text-xs whitespace-nowrap text-ink-soft">Stop {position}</span>}
+    </span>
+  )
+}
+
 function Row({
   d,
   showStreet,
@@ -76,6 +95,8 @@ function Row({
   isHighlighted,
   onToggle,
   onShowOnMap,
+  tripPosition,
+  onToggleTrip,
 }: {
   d: ListedStop
   showStreet: boolean // two stores share this row's "City, ST"
@@ -84,17 +105,25 @@ function Row({
   isHighlighted: boolean
   onToggle: () => void
   onShowOnMap: () => void
+  tripPosition: number | null // 1-based place in the trip, or null
+  onToggleTrip: () => void
 }) {
   const labels = [storeTypeLabel(d.storeType), ...d.services]
+  // The trip toggle can't sit inside the row's button, so it is a sibling: under the row's text on phones, at the
+  // row's right from 768px. The details (when open) take the full width below both.
   return (
-    <li id={`row-${d.id}`} data-highlighted={isHighlighted || undefined} className="rt-row scroll-mt-4">
+    <li
+      id={`row-${d.id}`}
+      data-highlighted={isHighlighted || undefined}
+      className="rt-row flex scroll-mt-4 flex-wrap md:items-start"
+    >
       <button
         id={`row-${d.id}-button`}
         type="button"
         aria-expanded={isExpanded}
         aria-controls={isExpanded ? `row-${d.id}-details` : undefined}
         onClick={onToggle}
-        className="rt-row-button flex min-h-11 w-full items-start gap-3 py-3 pl-1 text-left"
+        className="rt-row-button flex min-h-11 w-full min-w-0 items-start gap-3 py-3 pl-1 text-left md:w-auto md:flex-1"
       >
         <RowMark type={d.storeType} number={d.number} active={isHighlighted} />
         <span className="min-w-0 flex-1">
@@ -117,7 +146,14 @@ function Row({
         </span>
         <Chevron className={`mt-2 ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
-      {isExpanded && <RowDetails d={d} onMap={onMap} onShowOnMap={onShowOnMap} />}
+      <div className="pb-3 pl-12 md:pt-2 md:pb-0 md:pl-3">
+        <TripToggle name={shortName(d, showStreet)} position={tripPosition} onToggle={onToggleTrip} />
+      </div>
+      {isExpanded && (
+        <div className="w-full">
+          <RowDetails d={d} onMap={onMap} onShowOnMap={onShowOnMap} />
+        </div>
+      )}
     </li>
   )
 }
@@ -164,7 +200,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   // A scroll to run once the page has rendered the change that asked for it. Always a new object, so repeating one works.
-  const [jump, setJump] = useState<{ to: 'map' | 'row'; id: string } | null>(null)
+  const [jump, setJump] = useState<{ to: 'map' | 'row' | 'trip'; id: string } | null>(null)
   const mapRef = useRef<HTMLDivElement>(null)
 
   const regionIds = useMemo(() => MAP.regions.map((r) => r.id), [])
@@ -225,6 +261,82 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   const expanded = visible.find((d) => d.id === expandedId)?.id ?? null
   const filtersActive = state !== ALL || region !== ALL || experience !== ALL || storeType !== ALL
 
+  // The trip lives in the URL too (?trip=id1,id2), in the visitor's order. Unknown or closed ids are left out.
+  const byId = useMemo(() => new Map(entries.map((d) => [d.id, d])), [entries])
+  const knownIds = useMemo(() => new Set(byId.keys()), [byId])
+  const trip = useMemo(() => parseTrip(readParam(search, 'trip'), knownIds), [search, knownIds])
+  const tripStops = useMemo(() => trip.ids.map((id) => byId.get(id)!), [trip, byId])
+  const tripPosition = (id: string) => {
+    const i = trip.ids.indexOf(id)
+    return i === -1 ? null : i + 1
+  }
+  const [tripOpen, setTripOpen] = useState<boolean | null>(null) // null: open whenever the trip has stops
+  const [announcement, setAnnouncement] = useState('')
+  // Until the visitor reorders by hand, adding a stop re-runs the suggested order from the start stop (the first one).
+  // A trip that arrived in a link with two or more stops keeps the order it came with.
+  const [manualOrder, setManualOrder] = useState(false)
+  const fromLink = useRef<boolean | null>(null)
+  const keepsOrder = () => {
+    fromLink.current ??= trip.ids.length > 1
+    return manualOrder || fromLink.current
+  }
+  const nameOf = (id: string) => {
+    const d = byId.get(id)!
+    return shortName(d, sharedPlaces.has(placeLabel(d)))
+  }
+  const writeTrip = (ids: string[], message: string) => {
+    writeParam('trip', ids.join(','))
+    notifyUrl()
+    setAnnouncement(`${message} ${ids.length} ${ids.length === 1 ? 'stop' : 'stops'} in your trip.`)
+  }
+  const reorderFrom = (startId: string | undefined, message: string) => {
+    fromLink.current = false
+    setManualOrder(false)
+    writeTrip(suggestOrder(tripStops, startId), message)
+  }
+
+  function toggleTrip(id: string) {
+    if (trip.ids.includes(id)) {
+      writeTrip(
+        trip.ids.filter((x) => x !== id),
+        `Removed ${nameOf(id)}.`,
+      )
+      return
+    }
+    const added = [...trip.ids, id]
+    const ids = keepsOrder() ? added : suggestOrder(added.map((x) => byId.get(x)!), added[0])
+    writeTrip(ids, `Added ${nameOf(id)} as stop ${ids.indexOf(id) + 1}.`)
+  }
+
+  const tripActions: TripActions = {
+    move(id, by) {
+      const i = trip.ids.indexOf(id)
+      const j = i + by
+      if (i === -1 || j < 0 || j >= trip.ids.length) return
+      const ids = [...trip.ids]
+      ;[ids[i], ids[j]] = [ids[j], ids[i]]
+      setManualOrder(true)
+      writeTrip(ids, `Moved ${nameOf(id)} to stop ${j + 1}.`)
+    },
+    remove: (id) => writeTrip(
+      trip.ids.filter((x) => x !== id),
+      `Removed ${nameOf(id)}.`,
+    ),
+    start: (id) => reorderFrom(id, `Starting at ${nameOf(id)}; the other stops follow nearest first.`),
+    suggest: () => reorderFrom(trip.ids[0], 'Stops reordered, nearest first.'),
+    clear: () => {
+      fromLink.current = false
+      setManualOrder(false)
+      writeTrip([], 'Trip cleared.')
+    },
+  }
+
+  // Trip stops keep their pins even when a filter hides their row, so the trip line always joins every mapped stop.
+  const mapStops = useMemo(() => {
+    const shown = new Set(mapped.map((d) => d.id))
+    return [...mapped, ...tripStops.filter((d) => pinIds.has(d.id) && !shown.has(d.id))]
+  }, [mapped, tripStops, pinIds])
+
   const reset = () => {
     setRegionTouched(true)
     for (const name of ['state', 'region', 'experience', 'type'] as const) writeParam(name, '')
@@ -245,6 +357,12 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
   }
 
   function selectPin(id: string) {
+    // A trip pin whose row a filter hides: go to its place in the trip instead.
+    if (!visible.some((d) => d.id === id)) {
+      setTripOpen(true)
+      setJump({ to: 'trip', id })
+      return
+    }
     setSelectedId(id)
     setExpandedId(id)
     setJump({ to: 'row', id })
@@ -257,6 +375,10 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
       mapRef.current?.scrollIntoView({ behavior, block: 'start' })
       // The pin is now the thing in view, so keyboard users continue from there.
       mapRef.current?.querySelector<SVGGElement>(`[data-pin="${jump.id}"]`)?.focus({ preventScroll: true })
+    } else if (jump.to === 'trip') {
+      const item = document.getElementById(`trip-${jump.id}`)
+      item?.scrollIntoView({ behavior, block: 'center' })
+      item?.focus({ preventScroll: true })
     } else {
       document.getElementById(`row-${jump.id}`)?.scrollIntoView({ behavior, block: 'start' })
       // The row is now the thing in view, so keyboard users continue from there.
@@ -286,11 +408,12 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
       {/* From 768px the whole-country map is capped at 65% of the column and centred (about 35% smaller); zoomed into a
           region it takes the full column. Phones always get the full width. The map is drawn in screen pixels, so pins
           and labels keep their on-screen size at any width. */}
-      <div className={`mx-auto ${region === ALL ? 'md:max-w-[65%]' : ''}`}>
+      <div className={`rt-no-print mx-auto ${region === ALL ? 'md:max-w-[65%]' : ''}`}>
         <div ref={mapRef} className="scroll-mt-4">
           <UsMap
             layout={layout}
-            entries={mapped}
+            entries={mapStops}
+            trip={trip.ids}
             selectedId={selected?.id ?? null}
             onSelect={selectPin}
             regionId={region}
@@ -299,15 +422,26 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
             animate={regionTouched}
           />
         </div>
-        <MapKey stops={mapped} />
+        <MapKey stops={mapStops} trip={trip.ids} />
       </div>
       {entries.length > 0 && mapped.length === 0 && (
-        <p className="mt-2 text-center text-xs text-ink-soft">
+        <p className="rt-no-print mt-2 text-center text-xs text-ink-soft">
           {layout.pins.length === 0 ? 'No stores are on the map yet. Every store is in the list below.' : 'Nothing to show on the map for these filters.'}
         </p>
       )}
 
-      <section aria-labelledby="filters-heading" className="mt-6">
+      <TripPanel
+        stops={tripStops}
+        ignored={trip.ignored}
+        sharedPlaces={sharedPlaces}
+        open={tripOpen ?? tripStops.length > 0}
+        onToggleOpen={() => setTripOpen(!(tripOpen ?? tripStops.length > 0))}
+        canSuggest={suggestOrder(tripStops, trip.ids[0]).join(',') !== trip.ids.join(',')}
+        announcement={announcement}
+        actions={tripActions}
+      />
+
+      <section aria-labelledby="filters-heading" className="rt-no-print mt-6">
         <h2 id="filters-heading" className="sr-only">
           Find a store
         </h2>
@@ -337,7 +471,7 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
         </div>
       </section>
 
-      <section aria-labelledby="stores-heading" className="mt-4">
+      <section aria-labelledby="stores-heading" className="rt-no-print mt-4">
         <h2 id="stores-heading" className="text-xs tracking-[0.2em] text-accent-text uppercase">
           Stores
         </h2>
@@ -362,6 +496,8 @@ export default function Explorer({ entries, layout }: { entries: ListedStop[]; l
                 isHighlighted={selected?.id === d.id}
                 onToggle={() => toggleRow(d.id)}
                 onShowOnMap={() => showOnMap(d)}
+                tripPosition={tripPosition(d.id)}
+                onToggleTrip={() => toggleTrip(d.id)}
               />
             ))}
           </ul>

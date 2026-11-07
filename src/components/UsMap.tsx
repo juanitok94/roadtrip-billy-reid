@@ -3,7 +3,7 @@
 // The U.S. map, drawn at build time from us-atlas (src/lib/map-layout.ts). No tiles, no map library. Zooming to a
 // region only changes the nested viewBox (instant under prefers-reduced-motion); pins keep their on-screen size.
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react'
-import { KeyMark, PIN_RING, PIN_RING_SELECTED, PinMark, pinShape } from '@/components/PinMark'
+import { KeyMark, PIN_RING, PIN_RING_SELECTED, PinMark, TripBadge, pinShape } from '@/components/PinMark'
 import { MAP, STORE_TYPES, storeTypeLabel } from '@/data/types'
 import type { MapLayout, MapRegion } from '@/lib/map-layout'
 import { CHAR_W, LABEL_PX, PIN_PX, TARGET_PX, fitView, lerpView, placePins, toPx, type Rect } from '@/lib/map-view'
@@ -25,15 +25,27 @@ const stores = (n: number) => `${n} ${n === 1 ? 'store' : 'stores'}`
 const regionName = (id: string) => MAP.regions.find((r) => r.id === id)?.label ?? id
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 
-export function pinLabel(d: ListedStop): string {
+export function pinLabel(d: ListedStop, tripStop: number | null = null): string {
   const where = d.city ? `${d.city}, ${d.state}` : d.state
-  return `${padNumber(d.number)}: ${where}, ${storeTypeLabel(d.storeType)}`
+  return `${padNumber(d.number)}: ${where}, ${storeTypeLabel(d.storeType)}${tripStop ? `, trip stop ${tripStop}` : ''}`
 }
 
-// One quiet, non-interactive row under the map: the shape for each store type that has a pin.
-export function MapKey({ stops }: { stops: ListedStop[] }) {
+const TRIP_DASH = '6 5'
+
+// Consecutive trip stops that both have pins: the legs the dashed line draws.
+function tripLegs(trip: string[], pinned: (id: string) => boolean): [string, string][] {
+  const legs: [string, string][] = []
+  for (let i = 0; i + 1 < trip.length; i++) if (pinned(trip[i]) && pinned(trip[i + 1])) legs.push([trip[i], trip[i + 1]])
+  return legs
+}
+
+// One quiet, non-interactive row under the map: the shape for each store type that has a pin, and the trip line when
+// one is drawn.
+export function MapKey({ stops, trip = [] }: { stops: ListedStop[]; trip?: string[] }) {
   const types = STORE_TYPES.filter((t) => stops.some((d) => d.storeType === t.id))
-  if (types.length === 0) return null
+  const ids = new Set(stops.map((d) => d.id))
+  const hasLine = tripLegs(trip, (id) => ids.has(id)).length > 0
+  if (types.length === 0 && !hasLine) return null
   return (
     <ul aria-label="Map key" className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-ink-soft">
       {types.map((t) => (
@@ -42,6 +54,14 @@ export function MapKey({ stops }: { stops: ListedStop[] }) {
           {t.label}
         </li>
       ))}
+      {hasLine && (
+        <li className="flex items-center gap-1.5">
+          <svg viewBox="0 0 24 6" width="24" height="6" aria-hidden="true" className="block shrink-0">
+            <line x1="0" y1="3" x2="24" y2="3" stroke="var(--accent-text)" strokeWidth="2" strokeDasharray={TRIP_DASH} />
+          </svg>
+          Trip order (straight lines)
+        </li>
+      )}
     </ul>
   )
 }
@@ -54,6 +74,7 @@ function viewFor(regionId: string, regions: MapRegion[], whole: Rect): Rect {
 export default function UsMap({
   layout,
   entries,
+  trip,
   selectedId,
   onSelect,
   regionId,
@@ -63,6 +84,7 @@ export default function UsMap({
 }: {
   layout: MapLayout
   entries: ListedStop[]
+  trip: string[] // trip stop ids in order
   selectedId: string | null
   onSelect: (id: string) => void
   regionId: string
@@ -148,6 +170,12 @@ export default function UsMap({
     pxW,
     pxH,
   )
+
+  const tripStop = (id: string) => {
+    const i = trip.indexOf(id)
+    return i === -1 ? null : i + 1
+  }
+  const legs = tripLegs(trip, (id) => spots.has(id))
 
   const onKey = (e: KeyboardEvent<SVGGElement>, run: () => void) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -244,10 +272,33 @@ export default function UsMap({
             </g>
           )}
 
+          {/* The trip: straight dashed lines between stops in order, under the pins. Not a route. */}
+          {legs.length > 0 && (
+            <g aria-hidden="true" pointerEvents="none">
+              {legs.map(([a, b]) => {
+                const p = spots.get(a)!
+                const q = spots.get(b)!
+                return (
+                  <line
+                    key={`${a}-${b}`}
+                    x1={p.x}
+                    y1={p.y}
+                    x2={q.x}
+                    y2={q.y}
+                    stroke="var(--accent-text)"
+                    strokeWidth="2"
+                    strokeDasharray={TRIP_DASH}
+                  />
+                )
+              })}
+            </g>
+          )}
+
           {stops.map((d) => {
             const s = spots.get(d.id)
             if (!s) return null
             const selected = d.id === selectedId
+            const order = tripStop(d.id)
             return (
               <g
                 key={d.id}
@@ -259,7 +310,7 @@ export default function UsMap({
                   ? {
                       role: 'button',
                       tabIndex: 0,
-                      'aria-label': pinLabel(d),
+                      'aria-label': pinLabel(d, order),
                       'aria-expanded': selected,
                       'aria-controls': selected ? `row-${d.id}-details` : undefined,
                       onClick: () => onSelect(d.id),
@@ -270,6 +321,7 @@ export default function UsMap({
                 <rect x={-TARGET_PX / 2} y={-TARGET_PX / 2} width={TARGET_PX} height={TARGET_PX} fill="transparent" />
                 {pinShape(d.storeType, selected ? PIN_RING_SELECTED : PIN_RING, { className: 'rt-ring' })}
                 <PinMark type={d.storeType} number={d.number} active={selected} />
+                {order !== null && <TripBadge n={order} />}
               </g>
             )
           })}

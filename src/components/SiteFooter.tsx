@@ -13,10 +13,13 @@ export default function SiteFooter() {
     <footer className="mx-auto mt-12 max-w-5xl px-4 pb-8">
       <div className="rt-ruled space-y-2 pt-5 text-xs leading-relaxed text-ink-soft">
         <p className="text-ink">{UNOFFICIAL}</p>
-        <p className="tabular">{latest ? `Last verified: ${formatDate(latest)}` : 'Stores not yet verified'}</p>
-        {MAP.virtualStore && <p>{VIRTUAL}</p>}
+        {/* "Print trip" keeps only the unofficial line above. */}
+        <p className="rt-no-print tabular">{latest ? `Last verified: ${formatDate(latest)}` : 'Stores not yet verified'}</p>
+        {MAP.virtualStore && <p className="rt-no-print">{VIRTUAL}</p>}
         {MAP.credits.map((c) => (
-          <p key={c}>{c}</p>
+          <p key={c} className="rt-no-print">
+            {c}
+          </p>
         ))}
       </div>
     </footer>

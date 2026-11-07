@@ -165,4 +165,26 @@ option {
   .rt-land {
     fill: none;
   }
+
+  /* "Print trip" (html.rt-print-trip, set only while that print runs): just the trip list with addresses and hours
+     notes, the hours disclaimer and the unofficial line. A normal print of the page is unchanged. */
+  html.rt-print-trip .rt-no-print {
+    display: none !important;
+  }
+  html.rt-print-trip .rt-trip {
+    margin-top: 0;
+    border: 0;
+  }
+  html.rt-print-trip .rt-trip-body {
+    display: block !important;
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  html.rt-print-trip #trip-heading-button {
+    padding-left: 0;
+  }
+  html.rt-print-trip .rt-trip li {
+    break-inside: avoid;
+  }
 }
