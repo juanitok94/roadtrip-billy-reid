@@ -29,9 +29,9 @@ Prototype phase: noindex (robots meta, robots.txt disallow, no sitemap) unless N
 
 ## Look and motion
 - Dark navy theme; the CSS tokens in the repo are the source of truth. Serif headings (Fraunces), calm sans/mono UI, hairline borders, generous whitespace, no gradients or heavy shadows. Warm cream token for duotone highlights and type.
-- One signature movement per page (the scroll-driven hero split). Everything else is tiny and quick: 120 to 200 ms hovers, 400 to 700 ms for the signature move, ease-out, nothing bounces. Transform and opacity only, no layout shift.
-- Allowed small responses: pin and row hover, pin-row highlight, trip line draw, button easing, one-time load-in. Not allowed: parallax, cursor-following, autoplay, looping ambient motion, moving the filters or the map frame.
-- Reduced motion, no-JS and print get a static version. Hover effects only under (hover: hover).
+- One signature movement per page (the scroll-driven hero split, which includes the hero image's drift). Everything else is tiny and quick: 120 to 200 ms hovers, 400 to 700 ms for the signature move, ease-out, nothing bounces. Transform and opacity only, no layout shift.
+- Allowed small responses: pin and row hover, pin-row highlight, trip line draw, button easing, one-time load-in. Not allowed: cursor-following, autoplay, looping ambient motion, moving the filters or the map frame. One parallax is allowed, only inside the hero, as part of the scroll-driven split. Transform only, no layout shift, no other parallax anywhere.
+- Reduced motion, no-JS and print get a static version (the static hero must look complete on its own). Hover effects only under (hover: hover).
 - All images use the same navy and cream duotone.
 
 ## Accessibility

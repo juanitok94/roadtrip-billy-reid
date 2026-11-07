@@ -51,6 +51,12 @@ Every record: sourceUrl (https) + verifiedOn once checked. Virtual store lives i
 ## 7. Look
 Own look, not Wine & Gold. Dark navy, dark only (no toggle; `color-scheme: dark`, theme-color #0B1626): --page #0B1626, --surface #14253D (land, inputs), --ink #E8EEF7, --ink-soft #A9B6C8, --accent #5B8FD6 (fills, rules and large text only), --accent-text #8DB4EC (links, small text, pins), --ink-hover #FFFFFF (primary button hover), --line #6F86A6 (map state outlines, input borders). Hairlines (--hairline) are ink at 14% opacity. Primary buttons: --ink fill, --page text. Inputs and selects: --surface fill, --ink text, 1px --line border. Map: land --surface, state outlines --line, region boxes and labels --ink-soft; pins --accent-text with a --page number; the selected pin is larger with an --ink fill, a 3px --accent-text ring and the number in --page (shape by store type is kept, so selection never relies on color). On screens 768px and wider the whole-country map is capped at 65% of the column and centred, with the legend and caption directly under it; on phones it is full width, and a zoomed region uses the full column. Print stays light (white, black text, no map fill). Square corners, 1px rules, ledger-style list, dotted leaders. Fonts self-hosted: Fraunces 600 (headings, names), IBM Plex Mono 500 (labels). No logo, brand fonts or images from billyreid.com. Verify WCAG AA for every text/background pair with `npm run check:contrast` and report ratios.
 
+## 7a. Motion
+- One signature movement per page: the scroll-driven hero split. The headline halves ease apart on scroll (Billy Reid up-left, Road Trip down-right, about 8 to 12vw, never off-screen), 400 to 700 ms feel, ease-out; the hero image drifts at about 0.85x scroll speed.
+- One parallax is allowed, only inside the hero, as part of the scroll-driven split. Transform only, no layout shift, no other parallax anywhere.
+- Everything else is small and quick (120 to 200 ms): pin and row hover, pin-row highlight, trip line draw, button easing, a one-time load-in. No cursor-following, autoplay or looping motion.
+- Reduced motion, no-JS and print get a static hero that looks complete on its own.
+
 ## 8. Out of scope for v1
 Accounts, ratings, reviews, product info, pricing, appointment booking, real driving routing (links out only), photos, logos.
 
@@ -64,6 +70,7 @@ Accounts, ratings, reviews, product info, pricing, appointment booking, real dri
 1. Site name (see section 3).
 2. Whether the Outlet and the custom showroom show by default or behind a "store type" filter (recommended: shown, clearly labeled).
 3. Whether to add stockists later.
+4. Phone hero height. Resolved Nov 7, 2026 (designer pass): the hero fills the first phone screen (100svh) with the headline centred and the truck photo in the lower half; the map follows below.
 
 ## 11. Git
 Commit after checks pass and push to main. Vercel deploys from main. Never force-push. Never run git in C:\bourbon-guide.
